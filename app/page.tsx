@@ -1,4 +1,5 @@
-// components/HomeContent.tsx
+import Link from "next/link";
+
 export default function HomeContent() {
   return (
     <main className="min-h-screen flex items-center justify-center">
@@ -17,9 +18,12 @@ export default function HomeContent() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-indigo-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors shadow-lg">
+            <Link 
+              href="/upload"
+              className="bg-indigo-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors shadow-lg text-center"
+            >
               Upload Your First PDF
-            </button>
+            </Link>
             <button className="border border-indigo-600 text-indigo-600 px-8 py-3 rounded-lg font-semibold hover:bg-indigo-50 transition-colors">
               Watch Demo
             </button>
