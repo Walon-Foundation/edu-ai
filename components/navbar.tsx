@@ -1,15 +1,45 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // Change this to your auth state
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Default to false
+  const router = useRouter();
+
+  // Check authentication status on component mount
+  useEffect(() => {
+    // In a real app, you would check authentication status here
+    // For demo purposes, we'll check if user is on dashboard or has auth token
+    const checkAuth = async () => {
+      // Simulate auth check - replace with your actual auth logic
+      const token = localStorage.getItem('auth-token'); // or use your auth context
+      setIsLoggedIn(!!token);
+    };
+    
+    checkAuth();
+  }, []);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
+
+  const handleSignOut = () => {
+    // Clear authentication
+    localStorage.removeItem('auth-token');
+    setIsLoggedIn(false);
+    setIsProfileOpen(false);
+    router.push('/');
+  };
+
+  const handleSignIn = () => {
+    // Simulate sign in - replace with your actual sign in logic
+    localStorage.setItem('auth-token', 'demo-token');
+    setIsLoggedIn(true);
+    router.push('/dashboard');
+  };
 
   return (
     <nav className="bg-white shadow-sm border-b">
@@ -27,40 +57,73 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Desktop Navigation Links */}
+          {/* Desktop Navigation Links - Changes based on auth state */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
-              <Link
-                href="/"
-                className="text-gray-900 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Home
-              </Link>
-              <Link
-                href="/features"
-                className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Features
-              </Link>
-              <Link
-                href="/howitworks"
-                className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                How It Works
-              </Link>
-              <Link
-                href="/pricing"
-                className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Pricing
-              </Link>
+              {isLoggedIn ? (
+                // Navigation for logged in users
+                <>
+                  <Link
+                    href="/dashboard"
+                    className="text-gray-900 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    href="/upload"
+                    className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                  >
+                    Upload PDF
+                  </Link>
+                  <Link
+                    href="/documents"
+                    className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                  >
+                    My Documents
+                  </Link>
+                  <Link
+                    href="/history"
+                    className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                  >
+                    History
+                  </Link>
+                </>
+              ) : (
+                // Navigation for logged out users
+                <>
+                  <Link
+                    href="/"
+                    className="text-gray-900 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                  >
+                    Home
+                  </Link>
+                  <Link
+                    href="/features"
+                    className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                  >
+                    Features
+                  </Link>
+                  <Link
+                    href="/howitworks"
+                    className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                  >
+                    How It Works
+                  </Link>
+                  <Link
+                    href="/pricing"
+                    className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                  >
+                    Pricing
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 
           {/* Auth Buttons / Profile */}
           <div className="hidden md:flex items-center space-x-4">
             {isLoggedIn ? (
-              /* Profile Dropdown */
+              /* Profile Dropdown for logged in users */
               <div className="relative">
                 <button
                   onClick={toggleProfile}
@@ -93,24 +156,27 @@ export default function Navbar() {
                     <Link
                       href="/dashboard"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                      onClick={() => setIsProfileOpen(false)}
                     >
                       Dashboard
                     </Link>
                     <Link
                       href="/profile"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                      onClick={() => setIsProfileOpen(false)}
                     >
                       My Profile
                     </Link>
                     <Link
-                      href="/documents"
+                      href="/upload"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                      onClick={() => setIsProfileOpen(false)}
                     >
-                      My Documents
+                      Upload New
                     </Link>
                     <div className="border-t border-gray-100 my-1"></div>
                     <button
-                      onClick={() => setIsLoggedIn(false)}
+                      onClick={handleSignOut}
                       className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                     >
                       Sign Out
@@ -119,20 +185,20 @@ export default function Navbar() {
                 )}
               </div>
             ) : (
-              /* Auth Buttons */
+              /* Auth Buttons for logged out users */
               <>
-                <Link
-                  href="/sign-in"
+                <button
+                  onClick={handleSignIn}
                   className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                   Sign In
-                </Link>
-                <Link
-                  href="/sign-up"
+                </button>
+                <button
+                  onClick={handleSignIn}
                   className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors"
                 >
                   Get Started
-                </Link>
+                </button>
               </>
             )}
           </div>
@@ -156,18 +222,20 @@ export default function Navbar() {
                     <Link
                       href="/dashboard"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                      onClick={() => setIsProfileOpen(false)}
                     >
                       Dashboard
                     </Link>
                     <Link
                       href="/profile"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                      onClick={() => setIsProfileOpen(false)}
                     >
                       My Profile
                     </Link>
                     <div className="border-t border-gray-100 my-1"></div>
                     <button
-                      onClick={() => setIsLoggedIn(false)}
+                      onClick={handleSignOut}
                       className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                     >
                       Sign Out
@@ -211,53 +279,99 @@ export default function Navbar() {
         {isMenuOpen && (
           <div className="md:hidden border-t border-gray-200">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white">
-              <Link
-                href="/"
-                className="text-gray-900 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Home
-              </Link>
-              <Link
-                href="/features"
-                className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Features
-              </Link>
-              <Link
-                href="/howitworks"
-                className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                How It Works
-              </Link>
-              <Link
-                href="/pricing"
-                className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Pricing
-              </Link>
-
-              {/* Mobile Auth Buttons (when not logged in) */}
-              {!isLoggedIn && (
-                <div className="pt-4 pb-3 border-t border-gray-200">
+              {isLoggedIn ? (
+                // Mobile menu for logged in users
+                <>
                   <Link
-                    href="/sign-in"
+                    href="/dashboard"
+                    className="text-gray-900 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    href="/upload"
                     className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Sign In
+                    Upload PDF
                   </Link>
                   <Link
-                    href="/sign-up"
-                    className="bg-indigo-600 text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-700 transition-colors mt-2"
+                    href="/documents"
+                    className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Get Started
+                    My Documents
                   </Link>
-                </div>
+                  <Link
+                    href="/history"
+                    className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    History
+                  </Link>
+                  <div className="pt-4 pb-3 border-t border-gray-200">
+                    <Link
+                      href="/profile"
+                      className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      My Profile
+                    </Link>
+                    <button
+                      onClick={handleSignOut}
+                      className="text-red-600 hover:bg-red-50 block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors mt-2"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                </>
+              ) : (
+                // Mobile menu for logged out users
+                <>
+                  <Link
+                    href="/"
+                    className="text-gray-900 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Home
+                  </Link>
+                  <Link
+                    href="/features"
+                    className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Features
+                  </Link>
+                  <Link
+                    href="/howitworks"
+                    className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    How It Works
+                  </Link>
+                  <Link
+                    href="/pricing"
+                    className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Pricing
+                  </Link>
+                  <div className="pt-4 pb-3 border-t border-gray-200">
+                    <button
+                      onClick={handleSignIn}
+                      className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+                    >
+                      Sign In
+                    </button>
+                    <button
+                      onClick={handleSignIn}
+                      className="bg-indigo-600 text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-700 transition-colors mt-2"
+                    >
+                      Get Started
+                    </button>
+                  </div>
+                </>
               )}
             </div>
           </div>
