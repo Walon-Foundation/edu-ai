@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Link from "next/link";
 import { useState } from "react";
@@ -18,7 +18,10 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <Link href="/" className="text-2xl font-bold text-indigo-600 hover:text-indigo-700 transition-colors">
+              <Link
+                href="/"
+                className="text-2xl font-bold text-indigo-600 hover:text-indigo-700 transition-colors"
+              >
                 EduAI
               </Link>
             </div>
@@ -27,16 +30,28 @@ export default function Navbar() {
           {/* Desktop Navigation Links */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
-              <Link href="/" className="text-gray-900 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+              <Link
+                href="/"
+                className="text-gray-900 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              >
                 Home
               </Link>
-              <Link href="/features" className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+              <Link
+                href="/features"
+                className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              >
                 Features
               </Link>
-              <Link href="/howitworks" className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+              <Link
+                href="/howitworks"
+                className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              >
                 How It Works
               </Link>
-              <Link href="/pricing" className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+              <Link
+                href="/pricing"
+                className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              >
                 Pricing
               </Link>
             </div>
@@ -52,16 +67,23 @@ export default function Navbar() {
                   className="flex items-center space-x-2 text-gray-700 hover:text-indigo-600 transition-colors focus:outline-none"
                 >
                   <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                    <span className="text-indigo-600 font-semibold text-sm">U</span>
+                    <span className="text-indigo-600 font-semibold text-sm">
+                      U
+                    </span>
                   </div>
                   <span className="text-sm font-medium">Profile</span>
                   <svg
-                    className={`w-4 h-4 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`}
+                    className={`w-4 h-4 transition-transform ${isProfileOpen ? "rotate-180" : ""}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </button>
 
@@ -123,9 +145,11 @@ export default function Navbar() {
                   onClick={toggleProfile}
                   className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center"
                 >
-                  <span className="text-indigo-600 font-semibold text-sm">U</span>
+                  <span className="text-indigo-600 font-semibold text-sm">
+                    U
+                  </span>
                 </button>
-                
+
                 {/* Mobile Dropdown Menu */}
                 {isProfileOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
@@ -152,7 +176,7 @@ export default function Navbar() {
                 )}
               </div>
             )}
-            
+
             <button
               onClick={toggleMenu}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
@@ -164,9 +188,19 @@ export default function Navbar() {
                 viewBox="0 0 24 24"
               >
                 {isMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 )}
               </svg>
             </button>
@@ -205,7 +239,7 @@ export default function Navbar() {
               >
                 Pricing
               </Link>
-              
+
               {/* Mobile Auth Buttons (when not logged in) */}
               {!isLoggedIn && (
                 <div className="pt-4 pb-3 border-t border-gray-200">
@@ -232,8 +266,8 @@ export default function Navbar() {
 
       {/* Overlay to close dropdowns when clicking outside */}
       {(isProfileOpen || isMenuOpen) && (
-        <div 
-          className="fixed inset-0 z-40" 
+        <div
+          className="fixed inset-0 z-40"
           onClick={() => {
             setIsProfileOpen(false);
             setIsMenuOpen(false);

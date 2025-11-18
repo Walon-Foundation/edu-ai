@@ -10,15 +10,16 @@ export default function HomeContent() {
             Transform Your PDFs into
             <span className="text-indigo-600"> Learning Tools</span>
           </h1>
-          
+
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Upload your educational PDFs and instantly generate summaries, flashcards, 
-            Q&A sessions, and bullet points with AI-powered precision.
+            Upload your educational PDFs and instantly generate summaries,
+            flashcards, Q&A sessions, and bullet points with AI-powered
+            precision.
           </p>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
+            <Link
               href="/upload"
               className="bg-indigo-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors shadow-lg text-center"
             >

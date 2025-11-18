@@ -29,7 +29,9 @@ export default function HowItWorks() {
 
         {/* How It Works */}
         <div className="bg-gray-50 rounded-2xl shadow-lg p-8 max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">How It Works</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            How It Works
+          </h2>
           <div className="grid md:grid-cols-3 gap-8">
             <Step
               number={1}

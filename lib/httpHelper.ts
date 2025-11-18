@@ -1,6 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { env } from "./env"; 
-
+import { env } from "./env";
 
 interface ApiResponse<T = unknown> {
   ok: boolean;
@@ -19,26 +18,27 @@ interface ApiResponse<T = unknown> {
  * @returns A NextResponse object with the error payload.
  */
 
-
 export function errorResponse(
   statusCode: number,
   error: Error | string | any,
-  publicMessage: string
+  publicMessage: string,
 ): NextResponse<ApiResponse<null>> {
-  
   if (env.NODE_ENV === "development") {
     console.error("API Error:", error);
   }
 
   // 2. Return the NextResponse object
-  return NextResponse.json({
-    ok: false,
-    message: publicMessage,
-    error: publicMessage, // Use publicMessage for the error field
-    data: null,
-  } as ApiResponse<null>, {
-    status: statusCode
-  });
+  return NextResponse.json(
+    {
+      ok: false,
+      message: publicMessage,
+      error: publicMessage, // Use publicMessage for the error field
+      data: null,
+    } as ApiResponse<null>,
+    {
+      status: statusCode,
+    },
+  );
 }
 
 // ------------------------------------------------------------------
@@ -51,18 +51,19 @@ export function errorResponse(
  * @returns A NextResponse object with the success payload.
  */
 
-
 export function successResponse<T>(
   statusCode: number,
   message: string,
-  data?: T
+  data?: T,
 ): NextResponse<ApiResponse<T>> {
-  
-  return NextResponse.json({
-    ok: true,
-    message,
-    data: data || undefined, // Include data payload if provided
-  } as ApiResponse<T>, {
-    status: statusCode
-  });
+  return NextResponse.json(
+    {
+      ok: true,
+      message,
+      data: data || undefined, // Include data payload if provided
+    } as ApiResponse<T>,
+    {
+      status: statusCode,
+    },
+  );
 }
