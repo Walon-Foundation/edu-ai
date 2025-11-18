@@ -1,4 +1,3 @@
-// app/dashboard/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -18,8 +17,9 @@ import {
   Sparkles,
   Calendar,
   BarChart3,
-//   Filter,
-  Search
+  Search,
+  Menu,
+  X
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
@@ -74,6 +74,7 @@ export default function Dashboard() {
   const [selectedAction, setSelectedAction] = useState<{ fileId: string; action: string } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
   useEffect(() => {
     // Simulate API call delay
@@ -99,12 +100,10 @@ export default function Dashboard() {
         setUserFiles(result.data || []);
       } else {
         console.error("Failed to fetch user files");
-        // Fallback to demo files if API fails
         setUserFiles(demoFiles);
       }
     } catch (error) {
       console.error("Error fetching user files:", error);
-      // Fallback to demo files
       setUserFiles(demoFiles);
     } finally {
       setLoading(false);
@@ -120,7 +119,6 @@ export default function Dashboard() {
       });
 
       if (response.ok) {
-        // Remove file from local state
         setUserFiles(prev => prev.filter(file => file.id !== fileId));
         console.log("File deleted successfully");
       } else {
@@ -136,11 +134,8 @@ export default function Dashboard() {
   const handleGenerateContent = async (fileId: string, action: string) => {
     setSelectedAction({ fileId, action });
     
-    // Simulate AI processing
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
-      
-      // Navigate to results page or show modal with results
+      await new Promise(resolve => setTimeout(resolve, 2000));
       alert(`${action.charAt(0).toUpperCase() + action.slice(1)} generated successfully!\n\nThis would show the AI-generated ${action} in a real application.`);
     } catch (error) {
       console.error(`Error generating ${action}:`, error);
@@ -161,13 +156,13 @@ export default function Dashboard() {
   const getStatusBadge = (status: UserFile["status"]) => {
     switch (status) {
       case "processed":
-        return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Ready</Badge>;
+        return <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-xs">Ready</Badge>;
       case "processing":
-        return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Processing</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 text-xs">Processing</Badge>;
       case "pending":
-        return <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">Pending</Badge>;
+        return <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100 text-xs">Pending</Badge>;
       default:
-        return <Badge variant="secondary">Unknown</Badge>;
+        return <Badge variant="secondary" className="text-xs">Unknown</Badge>;
     }
   };
 
@@ -185,7 +180,7 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading your documents...</p>
@@ -196,92 +191,144 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-4 sm:py-6 lg:py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="p-2 bg-indigo-100 rounded-lg">
-              <Sparkles className="h-6 w-6 text-indigo-600" />
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+            <div className="p-1.5 sm:p-2 bg-indigo-100 rounded-lg">
+              <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-indigo-600" />
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
               Your Study Documents
             </h1>
           </div>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-2">
             Transform your PDFs into smart study materials with AI-powered tools
           </p>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        {/* Stats Cards - Responsive Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4 mb-6 sm:mb-8">
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total Files</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">Total Files</p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.total}</p>
                 </div>
-                <FileText className="h-8 w-8 text-indigo-500" />
+                <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-indigo-500" />
               </div>
             </CardContent>
           </Card>
           
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Ready</p>
-                  <p className="text-2xl font-bold text-green-600">{stats.processed}</p>
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">Ready</p>
+                  <p className="text-xl sm:text-2xl font-bold text-green-600">{stats.processed}</p>
                 </div>
-                <BookOpen className="h-8 w-8 text-green-500" />
+                <BookOpen className="h-6 w-6 sm:h-8 sm:w-8 text-green-500" />
               </div>
             </CardContent>
           </Card>
           
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Processing</p>
-                  <p className="text-2xl font-bold text-blue-600">{stats.processing}</p>
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">Processing</p>
+                  <p className="text-xl sm:text-2xl font-bold text-blue-600">{stats.processing}</p>
                 </div>
-                <BarChart3 className="h-8 w-8 text-blue-500" />
+                <BarChart3 className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500" />
               </div>
             </CardContent>
           </Card>
           
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Storage Used</p>
-                  <p className="text-2xl font-bold text-purple-600">11.5 MB</p>
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">Storage Used</p>
+                  <p className="text-xl sm:text-2xl font-bold text-purple-600">11.5 MB</p>
                 </div>
-                <Download className="h-8 w-8 text-purple-500" />
+                <Download className="h-6 w-6 sm:h-8 sm:w-8 text-purple-500" />
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Search and Filter Bar */}
-        <Card className="mb-6 border-0 shadow-sm">
-          <CardContent className="p-4">
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-              <div className="flex flex-1 gap-4 w-full sm:w-auto">
-                <div className="relative flex-1 max-w-md">
+        <Card className="mb-4 sm:mb-6 border-0 shadow-sm">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center justify-between">
+              {/* Search and Filter Section */}
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
+                {/* Search Input */}
+                <div className="relative flex-1 min-w-0">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                   <Input
                     placeholder="Search documents..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 bg-white/80"
+                    className="pl-10 bg-white/80 text-sm sm:text-base"
                   />
                 </div>
+                
+                {/* Desktop Filter */}
+                <div className="hidden sm:block">
+                  <select 
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg bg-white/80 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="processed">Ready</option>
+                    <option value="processing">Processing</option>
+                    <option value="pending">Pending</option>
+                  </select>
+                </div>
+
+                {/* Mobile Filter Button */}
+                <div className="sm:hidden">
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
+                    className="w-full justify-center gap-2"
+                    size="sm"
+                  >
+                    {isMobileFilterOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+                    Filter
+                  </Button>
+                </div>
+              </div>
+
+              {/* Upload Button */}
+              <Button 
+                onClick={() => window.location.href = '/upload'} 
+                className="gap-2 w-full sm:w-auto justify-center"
+                size="sm"
+              >
+                <Plus className="h-4 w-4" />
+                <span className="hidden xs:inline">Upload New</span>
+                <span className="xs:hidden">Upload</span>
+              </Button>
+            </div>
+
+            {/* Mobile Filter Dropdown */}
+            {isMobileFilterOpen && (
+              <div className="sm:hidden mt-3 p-3 bg-gray-50 rounded-lg">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Filter by Status
+                </label>
                 <select 
                   value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg bg-white/80 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  onChange={(e) => {
+                    setFilterStatus(e.target.value);
+                    setIsMobileFilterOpen(false);
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
                 >
                   <option value="all">All Status</option>
                   <option value="processed">Ready</option>
@@ -289,22 +336,18 @@ export default function Dashboard() {
                   <option value="pending">Pending</option>
                 </select>
               </div>
-              <Button onClick={() => window.location.href = '/upload'} className="gap-2">
-                <Plus className="h-4 w-4" />
-                Upload New
-              </Button>
-            </div>
+            )}
           </CardContent>
         </Card>
 
         {filteredFiles.length === 0 ? (
-          <Card className="text-center py-16 border-0 shadow-sm">
-            <CardContent>
-              <FileText className="mx-auto h-20 w-20 text-gray-300 mb-4" />
-              <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+          <Card className="text-center py-12 sm:py-16 border-0 shadow-sm">
+            <CardContent className="px-4 sm:px-6">
+              <FileText className="mx-auto h-16 w-16 sm:h-20 sm:w-20 text-gray-300 mb-4" />
+              <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
                 {searchQuery || filterStatus !== "all" ? "No matching files" : "No files uploaded yet"}
               </h3>
-              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+              <p className="text-gray-600 mb-6 max-w-md mx-auto text-sm sm:text-base">
                 {searchQuery || filterStatus !== "all" 
                   ? "Try adjusting your search or filter criteria"
                   : "Upload your first PDF to get started with AI-powered study materials."
@@ -321,134 +364,134 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-6">
+          <div className="grid gap-4 sm:gap-6">
             <Card className="border-0 shadow-sm">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <FileText className="h-6 w-6 text-indigo-600" />
+              <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6">
+                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                  <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-indigo-600" />
                   Your Documents ({filteredFiles.length})
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm sm:text-base">
                   Click on any action button to generate AI-powered study materials
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[600px] pr-4">
-                  <div className="space-y-4">
+              <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+                <ScrollArea className="h-[500px] sm:h-[600px] pr-2 sm:pr-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {filteredFiles.map((file) => (
-                      <Card key={file.id} className="p-6 hover:shadow-md transition-all duration-200 border border-gray-100">
-                        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
-                          <div className="flex items-start space-x-4 flex-1 min-w-0">
-                            <div className="relative">
-                              <FileText className="h-12 w-12 text-red-500 flex-shrink-0" />
+                      <Card key={file.id} className="p-4 sm:p-6 hover:shadow-md transition-all duration-200 border border-gray-100">
+                        <div className="flex flex-col gap-4">
+                          {/* File Header */}
+                          <div className="flex items-start gap-3 sm:gap-4">
+                            <div className="relative flex-shrink-0">
+                              <FileText className="h-8 w-8 sm:h-10 sm:h-12 text-red-500" />
                               {file.status === "processing" && (
                                 <div className="absolute -top-1 -right-1">
-                                  <div className="animate-ping h-3 w-3 bg-blue-500 rounded-full"></div>
-                                  <div className="absolute top-0 right-0 h-3 w-3 bg-blue-500 rounded-full"></div>
+                                  <div className="animate-ping h-2 w-2 sm:h-3 sm:w-3 bg-blue-500 rounded-full"></div>
+                                  <div className="absolute top-0 right-0 h-2 w-2 sm:h-3 sm:w-3 bg-blue-500 rounded-full"></div>
                                 </div>
                               )}
                             </div>
+                            
                             <div className="flex-1 min-w-0">
-                              <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
-                                <h3 className="font-semibold text-gray-900 truncate text-lg">
+                              {/* File Name and Badges */}
+                              <div className="flex flex-col gap-2 mb-2">
+                                <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
                                   {file.fileName}
                                 </h3>
-                                <div className="flex items-center gap-2">
+                                <div className="flex flex-wrap gap-2">
                                   {getStatusBadge(file.status)}
-                                  <Badge variant="secondary" className="bg-gray-100">
+                                  <Badge variant="secondary" className="bg-gray-100 text-xs">
                                     {file.fileSize}
                                   </Badge>
                                 </div>
                               </div>
                               
-                              <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
-                                <div className="flex items-center gap-1">
-                                  <Calendar className="h-4 w-4" />
-                                  <span>Uploaded {formatDate(file.createdAt)}</span>
-                                </div>
+                              {/* Upload Date */}
+                              <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">
+                                <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
+                                <span>Uploaded {formatDate(file.createdAt)}</span>
                               </div>
 
                               {/* Processing Progress */}
                               {file.status === "processing" && (
-                                <div className="mb-4">
-                                  <div className="flex justify-between text-sm text-gray-600 mb-1">
+                                <div className="mb-3 sm:mb-4">
+                                  <div className="flex justify-between text-xs sm:text-sm text-gray-600 mb-1">
                                     <span>AI Processing</span>
                                     <span>65%</span>
                                   </div>
-                                  <Progress value={65} className="h-2" />
+                                  <Progress value={65} className="h-1.5 sm:h-2" />
                                 </div>
                               )}
-                              
-                              {/* Action Buttons */}
-                              <div className="flex flex-col sm:flex-row flex-wrap gap-3">
-                                <Button
-                                  onClick={() => handleGenerateContent(file.id, 'summary')}
-                                  disabled={selectedAction?.fileId === file.id && selectedAction?.action === 'summary' || file.status !== "processed"}
-                                  variant="outline"
-                                  className="gap-2 flex-1 sm:flex-none"
-                                  size="sm"
-                                >
-                                  <BookOpen className="h-4 w-4" />
-                                  {selectedAction?.fileId === file.id && selectedAction?.action === 'summary' ? (
-                                    "Generating..."
-                                  ) : (
-                                    "Summaries"
-                                  )}
-                                </Button>
+                            </div>
+                          </div>
+                          
+                          {/* Action Buttons */}
+                          <div className="flex flex-col sm:flex-row gap-2">
+                            {/* AI Action Buttons */}
+                            <div className="flex flex-col xs:flex-row gap-2 flex-1">
+                              <Button
+                                onClick={() => handleGenerateContent(file.id, 'summary')}
+                                disabled={selectedAction?.fileId === file.id && selectedAction?.action === 'summary' || file.status !== "processed"}
+                                variant="outline"
+                                className="gap-2 flex-1 justify-center"
+                                size="sm"
+                              >
+                                <BookOpen className="h-3 w-3 sm:h-4 sm:w-4" />
+                                <span className="text-xs sm:text-sm">
+                                  {selectedAction?.fileId === file.id && selectedAction?.action === 'summary' ? "Generating..." : "Summaries"}
+                                </span>
+                              </Button>
 
-                                <Button
-                                  onClick={() => handleGenerateContent(file.id, 'flashcards')}
-                                  disabled={selectedAction?.fileId === file.id && selectedAction?.action === 'flashcards' || file.status !== "processed"}
-                                  variant="outline"
-                                  className="gap-2 flex-1 sm:flex-none"
-                                  size="sm"
-                                >
-                                  <Layers className="h-4 w-4" />
-                                  {selectedAction?.fileId === file.id && selectedAction?.action === 'flashcards' ? (
-                                    "Generating..."
-                                  ) : (
-                                    "Flashcards"
-                                  )}
-                                </Button>
+                              <Button
+                                onClick={() => handleGenerateContent(file.id, 'flashcards')}
+                                disabled={selectedAction?.fileId === file.id && selectedAction?.action === 'flashcards' || file.status !== "processed"}
+                                variant="outline"
+                                className="gap-2 flex-1 justify-center"
+                                size="sm"
+                              >
+                                <Layers className="h-3 w-3 sm:h-4 sm:w-4" />
+                                <span className="text-xs sm:text-sm">
+                                  {selectedAction?.fileId === file.id && selectedAction?.action === 'flashcards' ? "Generating..." : "Flashcards"}
+                                </span>
+                              </Button>
 
-                                <Button
-                                  onClick={() => handleGenerateContent(file.id, 'qa')}
-                                  disabled={selectedAction?.fileId === file.id && selectedAction?.action === 'qa' || file.status !== "processed"}
-                                  variant="outline"
-                                  className="gap-2 flex-1 sm:flex-none"
-                                  size="sm"
-                                >
-                                  <HelpCircle className="h-4 w-4" />
-                                  {selectedAction?.fileId === file.id && selectedAction?.action === 'qa' ? (
-                                    "Generating..."
-                                  ) : (
-                                    "Q&A"
-                                  )}
-                                </Button>
+                              <Button
+                                onClick={() => handleGenerateContent(file.id, 'qa')}
+                                disabled={selectedAction?.fileId === file.id && selectedAction?.action === 'qa' || file.status !== "processed"}
+                                variant="outline"
+                                className="gap-2 flex-1 justify-center"
+                                size="sm"
+                              >
+                                <HelpCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+                                <span className="text-xs sm:text-sm">
+                                  {selectedAction?.fileId === file.id && selectedAction?.action === 'qa' ? "Generating..." : "Q&A"}
+                                </span>
+                              </Button>
+                            </div>
 
-                                <div className="flex gap-2">
-                                  <Button
-                                    onClick={() => window.open(file.fileUrl, '_blank')}
-                                    variant="ghost"
-                                    size="sm"
-                                    className="gap-2"
-                                    disabled={file.status !== "processed"}
-                                  >
-                                    <Download className="h-4 w-4" />
-                                    <span className="hidden sm:inline">Download</span>
-                                  </Button>
+                            {/* Utility Buttons */}
+                            <div className="flex gap-2 justify-center sm:justify-start">
+                              <Button
+                                onClick={() => window.open(file.fileUrl, '_blank')}
+                                variant="ghost"
+                                size="sm"
+                                className="gap-1 sm:gap-2 flex-1 sm:flex-none"
+                                disabled={file.status !== "processed"}
+                              >
+                                <Download className="h-3 w-3 sm:h-4 sm:w-4" />
+                                <span className="text-xs sm:text-sm hidden xs:inline">Download</span>
+                              </Button>
 
-                                  <Button
-                                    onClick={() => handleDeleteFile(file.id, file.fileName)}
-                                    variant="ghost"
-                                    size="sm"
-                                    className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                    <span className="hidden sm:inline">Delete</span>
-                                  </Button>
-                                </div>
-                              </div>
+                              <Button
+                                onClick={() => handleDeleteFile(file.id, file.fileName)}
+                                variant="ghost"
+                                size="sm"
+                                className="gap-1 sm:gap-2 flex-1 sm:flex-none text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                                <span className="text-xs sm:text-sm hidden xs:inline">Delete</span>
+                              </Button>
                             </div>
                           </div>
                         </div>
