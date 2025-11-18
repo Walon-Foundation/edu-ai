@@ -127,8 +127,8 @@ export default function UploadPage() {
       });
       
       // Add any additional data you want to send
-      formData.append('userId', 'user-id-here'); // Replace with actual user ID
-      formData.append('timestamp', new Date().toISOString());
+      // formData.append('userId', 'user-id-here'); // Replace with actual user ID
+      // formData.append('timestamp', new Date().toISOString());
       
       // Send to your backend API
       const response = await fetch('/api/upload', {
