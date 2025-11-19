@@ -15,6 +15,13 @@
       "when": 1763505886241,
       "tag": "0001_ancient_malcolm_colcord",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1763540578895,
+      "tag": "0002_tan_khan",
+      "breakpoints": true
     }
   ]
 }
