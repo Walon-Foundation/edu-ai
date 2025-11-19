@@ -8,11 +8,11 @@ import { and, eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
 import { PDFParse } from "pdf-parse"
 
-export async function GET(req:NextRequest, {params}:{params:Promise<{fileName:string}>}){
+export async function GET(req:NextRequest, {params}:{params:Promise<{fileId:string}>}){
     try{
         const { userId } = await auth()
-        const fileName = (await params).fileName
-        const file = (await db.select().from(fileTable).where(and(eq(fileTable.clerkId, userId as string), eq(fileTable.fileName, fileName))).limit(1).execute())[0]
+        const fileId = (await params).fileId
+        const file = (await db.select().from(fileTable).where(and(eq(fileTable.clerkId, userId as string), eq(fileTable.id, fileId))).limit(1).execute())[0]
         if(!file){
             errorResponse(
                 401,
@@ -21,7 +21,7 @@ export async function GET(req:NextRequest, {params}:{params:Promise<{fileName:st
             )
         }
 
-        const { data, error } = await supabase.storage.from("files").download(fileName)
+        const { data, error } = await supabase.storage.from("files").download(file.fileName)
         if(error){
             errorResponse(
                 500,
@@ -50,17 +50,16 @@ export async function GET(req:NextRequest, {params}:{params:Promise<{fileName:st
                 {
                     role:"system",
                     content:`
-                   You are an expert at creating high-quality learning questions and answers. Your Q&A must:
+                    Create a highly concise executive summary of the provided text. Follow these strict guidelines:
                     **REQUIREMENTS:**
-                    - Create 10-15 thoughtful questions that test real understanding
-                    - Focus on the most important concepts from the text
-                    - Questions should require meaningful understanding, not just recall
-                    - Answers should be clear, accurate, and directly based on the text
-                    - Format: Simple Q: and A: format
-                    - Cover different aspects: concepts, applications, relationships
-                    - Questions should help someone learn and understand the material deeply
-                    Use the text below to do the above task ${text}
-                    `                    
+                    - Maximum 150-200 words
+                    - Focus ONLY on core concepts and main arguments
+                    - Omit examples, anecdotes, and minor details
+                    - Use clear, direct language
+                    - Structure: Overview → Key Points → Conclusion
+                    **TEXT TO SUMMARIZE:**
+                    ${text}
+                    `
                 }
             ],
             stream:false,
@@ -72,13 +71,13 @@ export async function GET(req:NextRequest, {params}:{params:Promise<{fileName:st
             errorResponse(
                 500,
                 null,
-                "failed to generate question and answer"
+                "failed to generate summary"
             )
         }
 
         successResponse(
             200,
-            `question and answer of the pdf ${fileName}`,
+            `summary of the pdf ${file.fileName}`,
             aiResult,
         )
 
