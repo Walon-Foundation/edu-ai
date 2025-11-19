@@ -41,7 +41,7 @@ export default function UploadPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [isSendingToServer, setIsSendingToServer] = useState(false);
 
-  const router = useRouter()
+  const router = useRouter();
 
   const onDrop = (acceptedFiles: File[]) => {
     setIsDragging(false);
@@ -142,7 +142,7 @@ export default function UploadPage() {
         throw new Error("Failed to upload files");
       }
 
-      router.push("/dashboard")
+      router.push("/dashboard");
 
       // Show success message
       toast.success("Files successfully uploaded to server!");

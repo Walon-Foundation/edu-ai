@@ -3,15 +3,21 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "react-toastify";
-import { 
-  FileText, 
-  Trash2, 
-  BookOpen, 
+import {
+  FileText,
+  Trash2,
+  BookOpen,
   HelpCircle,
   Layers,
   Plus,
@@ -20,7 +26,7 @@ import {
   BarChart3,
   Search,
   Menu,
-  X
+  X,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
@@ -35,7 +41,10 @@ interface UserFile {
 export default function Dashboard() {
   const [userFiles, setUserFiles] = useState<UserFile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedAction, setSelectedAction] = useState<{ fileId: string; action: string } | null>(null);
+  const [selectedAction, setSelectedAction] = useState<{
+    fileId: string;
+    action: string;
+  } | null>(null);
   const [deletingFiles, setDeletingFiles] = useState<Set<string>>(new Set()); // Track files being deleted
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
@@ -76,14 +85,14 @@ export default function Dashboard() {
 
     try {
       // Add file to deleting set to show loading state
-      setDeletingFiles(prev => new Set(prev).add(fileId));
+      setDeletingFiles((prev) => new Set(prev).add(fileId));
 
       const response = await fetch(`/api/files/${fileId}`, {
         method: "DELETE",
       });
 
       if (response.ok) {
-        setUserFiles(prev => prev.filter(file => file.id !== fileId));
+        setUserFiles((prev) => prev.filter((file) => file.id !== fileId));
         toast.success("File deleted successfully");
       } else {
         toast.error("Failed to delete file");
@@ -92,7 +101,7 @@ export default function Dashboard() {
       toast.error("Error deleting file");
     } finally {
       // Remove file from deleting set
-      setDeletingFiles(prev => {
+      setDeletingFiles((prev) => {
         const newSet = new Set(prev);
         newSet.delete(fileId);
         return newSet;
@@ -100,13 +109,17 @@ export default function Dashboard() {
     }
   };
 
-  const handleGenerateContent = async (fileId: string, fileName: string, action: string) => {
+  const handleGenerateContent = async (
+    fileId: string,
+    fileName: string,
+    action: string,
+  ) => {
     setSelectedAction({ fileId, action });
-    
+
     try {
       // Navigate immediately to the generate page with the action
       router.push(`/generate/${fileName}?action=${action}&fileId=${fileId}`);
-      
+
       // The actual generation will happen on the generate page
     } catch (error) {
       console.error(`Error navigating to generate page:`, error);
@@ -117,16 +130,20 @@ export default function Dashboard() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
   const getStatusBadge = (file: UserFile) => {
     // Since we removed status, all files are considered "ready"
-    return <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-xs">Ready</Badge>;
+    return (
+      <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-xs">
+        Ready
+      </Badge>
+    );
   };
 
   // Calculate total storage used from all files
@@ -135,24 +152,24 @@ export default function Dashboard() {
 
     const totalBytes = userFiles.reduce((total, file) => {
       if (!file.fileSize) return total;
-      
+
       // Parse file size string (e.g., "2.4 MB", "1.8 MB")
       const sizeMatch = file.fileSize.match(/(\d+\.?\d*)\s*(B|KB|MB|GB)/i);
       if (!sizeMatch) return total;
-      
+
       const sizeValue = parseFloat(sizeMatch[1]);
       const unit = sizeMatch[2].toUpperCase();
-      
+
       // Convert everything to bytes for calculation
       switch (unit) {
-        case 'B':
+        case "B":
           return total + sizeValue;
-        case 'KB':
-          return total + (sizeValue * 1024);
-        case 'MB':
-          return total + (sizeValue * 1024 * 1024);
-        case 'GB':
-          return total + (sizeValue * 1024 * 1024 * 1024);
+        case "KB":
+          return total + sizeValue * 1024;
+        case "MB":
+          return total + sizeValue * 1024 * 1024;
+        case "GB":
+          return total + sizeValue * 1024 * 1024 * 1024;
         default:
           return total;
       }
@@ -160,13 +177,15 @@ export default function Dashboard() {
 
     // Convert back to MB for display
     if (totalBytes === 0) return "0 MB";
-    
+
     const totalMB = totalBytes / (1024 * 1024);
     return `${totalMB.toFixed(1)} MB`;
   };
 
-  const filteredFiles = userFiles.filter(file => {
-    const matchesSearch = file.fileName.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredFiles = userFiles.filter((file) => {
+    const matchesSearch = file.fileName
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
     // Since we removed status filter, only apply search filter
     return matchesSearch;
   });
@@ -213,44 +232,60 @@ export default function Dashboard() {
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Total Files</p>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.total}</p>
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">
+                    Total Files
+                  </p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">
+                    {stats.total}
+                  </p>
                 </div>
                 <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-indigo-500" />
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Ready</p>
-                  <p className="text-xl sm:text-2xl font-bold text-green-600">{stats.processed}</p>
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">
+                    Ready
+                  </p>
+                  <p className="text-xl sm:text-2xl font-bold text-green-600">
+                    {stats.processed}
+                  </p>
                 </div>
                 <BookOpen className="h-6 w-6 sm:h-8 sm:w-8 text-green-500" />
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Processing</p>
-                  <p className="text-xl sm:text-2xl font-bold text-blue-600">{stats.processing}</p>
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">
+                    Processing
+                  </p>
+                  <p className="text-xl sm:text-2xl font-bold text-blue-600">
+                    {stats.processing}
+                  </p>
                 </div>
                 <BarChart3 className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500" />
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Storage Used</p>
-                  <p className="text-xl sm:text-2xl font-bold text-purple-600">{stats.storageUsed}</p>
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">
+                    Storage Used
+                  </p>
+                  <p className="text-xl sm:text-2xl font-bold text-purple-600">
+                    {stats.storageUsed}
+                  </p>
                 </div>
                 <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-purple-500" />
               </div>
@@ -272,12 +307,12 @@ export default function Dashboard() {
                     className="pl-10 bg-white/80 text-sm sm:text-base"
                   />
                 </div>
-                
+
                 {/* Remove status filter dropdown since status field is removed */}
               </div>
 
-              <Button 
-                onClick={() => window.location.href = '/upload'} 
+              <Button
+                onClick={() => (window.location.href = "/upload")}
                 className="gap-2 w-full sm:w-auto justify-center"
                 size="sm"
               >
@@ -297,13 +332,12 @@ export default function Dashboard() {
                 {searchQuery ? "No matching files" : "No files uploaded yet"}
               </h3>
               <p className="text-gray-600 mb-6 max-w-md mx-auto text-sm sm:text-base">
-                {searchQuery 
+                {searchQuery
                   ? "Try adjusting your search criteria"
-                  : "Upload your first PDF to get started with AI-powered study materials."
-                }
+                  : "Upload your first PDF to get started with AI-powered study materials."}
               </p>
-              <Button 
-                onClick={() => window.location.href = '/upload'} 
+              <Button
+                onClick={() => (window.location.href = "/upload")}
                 size="lg"
                 className="gap-2"
               >
@@ -321,7 +355,8 @@ export default function Dashboard() {
                   Your Documents ({filteredFiles.length})
                 </CardTitle>
                 <CardDescription className="text-sm sm:text-base">
-                  Click on any action button to generate AI-powered study materials
+                  Click on any action button to generate AI-powered study
+                  materials
                 </CardDescription>
               </CardHeader>
               <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
@@ -330,83 +365,134 @@ export default function Dashboard() {
                     {filteredFiles.map((file) => {
                       const isDeleting = deletingFiles.has(file.id);
                       return (
-                        <Card key={file.id} className="p-3 sm:p-4 hover:shadow-md transition-all duration-200 border border-gray-100">
+                        <Card
+                          key={file.id}
+                          className="p-3 sm:p-4 hover:shadow-md transition-all duration-200 border border-gray-100"
+                        >
                           <div className="flex flex-col gap-3">
                             {/* File Header - Compact on mobile */}
                             <div className="flex items-start gap-3">
                               <div className="relative flex-shrink-0">
                                 <FileText className="h-8 w-8 sm:h-10 sm:h-12 text-red-500" />
                               </div>
-                              
+
                               <div className="flex-1 min-w-0">
                                 {/* File Name - Proper truncation */}
                                 <h3 className="font-semibold text-gray-900 text-sm sm:text-base leading-tight break-words mb-1">
                                   {file.fileName}
                                 </h3>
-                                
+
                                 {/* Badges - Stack on mobile */}
                                 <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
                                   {getStatusBadge(file)}
                                   {file.fileSize && (
-                                    <Badge variant="secondary" className="bg-gray-100 text-xs">
+                                    <Badge
+                                      variant="secondary"
+                                      className="bg-gray-100 text-xs"
+                                    >
                                       {file.fileSize}
                                     </Badge>
                                   )}
                                   {isDeleting && (
-                                    <Badge variant="secondary" className="bg-amber-100 text-amber-800 text-xs">
+                                    <Badge
+                                      variant="secondary"
+                                      className="bg-amber-100 text-amber-800 text-xs"
+                                    >
                                       Deleting...
                                     </Badge>
                                   )}
                                 </div>
-                                
+
                                 {/* Upload Date */}
                                 <div className="flex items-center gap-1 text-xs text-gray-500 mb-2">
                                   <Calendar className="h-3 w-3 flex-shrink-0" />
-                                  <span className="truncate">Uploaded {formatDate(file.createdAt)}</span>
+                                  <span className="truncate">
+                                    Uploaded {formatDate(file.createdAt)}
+                                  </span>
                                 </div>
                               </div>
                             </div>
-                            
+
                             {/* Action Buttons - Improved mobile layout */}
                             <div className="flex flex-col gap-2">
                               {/* AI Action Buttons - Grid layout on mobile */}
                               <div className="grid grid-cols-1 xs:grid-cols-3 gap-2">
                                 <Button
-                                  onClick={() => handleGenerateContent(file.id, file.fileName, 'summary')}
-                                  disabled={selectedAction?.fileId === file.id && selectedAction?.action === 'summary' || isDeleting}
+                                  onClick={() =>
+                                    handleGenerateContent(
+                                      file.id,
+                                      file.fileName,
+                                      "summary",
+                                    )
+                                  }
+                                  disabled={
+                                    (selectedAction?.fileId === file.id &&
+                                      selectedAction?.action === "summary") ||
+                                    isDeleting
+                                  }
                                   variant="outline"
                                   className="gap-1 sm:gap-2 justify-center h-8 sm:h-9"
                                   size="sm"
                                 >
                                   <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                                   <span className="text-xs sm:text-sm truncate">
-                                    {selectedAction?.fileId === file.id && selectedAction?.action === 'summary' ? "Generating..." : "Summaries"}
+                                    {selectedAction?.fileId === file.id &&
+                                    selectedAction?.action === "summary"
+                                      ? "Generating..."
+                                      : "Summaries"}
                                   </span>
                                 </Button>
 
                                 <Button
-                                  onClick={() => handleGenerateContent(file.id, file.fileName, 'flashcards')}
-                                  disabled={selectedAction?.fileId === file.id && selectedAction?.action === 'flashcards' || isDeleting}
+                                  onClick={() =>
+                                    handleGenerateContent(
+                                      file.id,
+                                      file.fileName,
+                                      "flashcards",
+                                    )
+                                  }
+                                  disabled={
+                                    (selectedAction?.fileId === file.id &&
+                                      selectedAction?.action ===
+                                        "flashcards") ||
+                                    isDeleting
+                                  }
                                   variant="outline"
                                   className="gap-1 sm:gap-2 justify-center h-8 sm:h-9"
                                   size="sm"
                                 >
                                   <Layers className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                                   <span className="text-xs sm:text-sm truncate">
-                                    {selectedAction?.fileId === file.id && selectedAction?.action === 'flashcards' ? "Generating..." : "Flashcards"}
+                                    {selectedAction?.fileId === file.id &&
+                                    selectedAction?.action === "flashcards"
+                                      ? "Generating..."
+                                      : "Flashcards"}
                                   </span>
                                 </Button>
 
                                 <Button
-                                  onClick={() => handleGenerateContent(file.id, file.fileName, 'qa')}
-                                  disabled={selectedAction?.fileId === file.id && selectedAction?.action === 'qa' || isDeleting}
+                                  onClick={() =>
+                                    handleGenerateContent(
+                                      file.id,
+                                      file.fileName,
+                                      "qa",
+                                    )
+                                  }
+                                  disabled={
+                                    (selectedAction?.fileId === file.id &&
+                                      selectedAction?.action === "qa") ||
+                                    isDeleting
+                                  }
                                   variant="outline"
                                   className="gap-1 sm:gap-2 justify-center h-8 sm:h-9"
                                   size="sm"
                                 >
                                   <HelpCircle className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                                   <span className="text-xs sm:text-sm truncate">
-                                    {selectedAction?.fileId === file.id && selectedAction?.action === 'qa' ? "Generating..." : "Q&A"}
+                                    {selectedAction?.fileId === file.id &&
+                                    selectedAction?.action === "qa"
+                                      ? "Generating..."
+                                      : "Q&A"}
                                   </span>
                                 </Button>
                               </div>
@@ -414,7 +500,9 @@ export default function Dashboard() {
                               {/* Delete Button Only - Full width on mobile */}
                               <div className="flex gap-2">
                                 <Button
-                                  onClick={() => handleDeleteFile(file.id, file.fileName)}
+                                  onClick={() =>
+                                    handleDeleteFile(file.id, file.fileName)
+                                  }
                                   disabled={isDeleting}
                                   variant="ghost"
                                   size="sm"
@@ -423,12 +511,16 @@ export default function Dashboard() {
                                   {isDeleting ? (
                                     <>
                                       <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-red-600"></div>
-                                      <span className="text-xs sm:text-sm">Deleting...</span>
+                                      <span className="text-xs sm:text-sm">
+                                        Deleting...
+                                      </span>
                                     </>
                                   ) : (
                                     <>
                                       <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                                      <span className="text-xs sm:text-sm">Delete File</span>
+                                      <span className="text-xs sm:text-sm">
+                                        Delete File
+                                      </span>
                                     </>
                                   )}
                                 </Button>

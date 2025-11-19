@@ -9,7 +9,7 @@ const envSchema = z.object({
   SUPABASE_ROLE_KEY: z.string({ error: "SUPABASE_ROLE_KEY is required" }),
   NODE_ENV: z.string({ error: "NODE_ENV is required" }),
   DATABASE_URL: z.string({ error: "DATABASE_URL is required" }),
-  OPENROUTER_API_KEY:z.string({ error: "OPENROUTER_API_KEY is required"})
+  OPENROUTER_API_KEY: z.string({ error: "OPENROUTER_API_KEY is required" }),
 });
 
 export const env = envSchema.parse({
@@ -20,5 +20,5 @@ export const env = envSchema.parse({
   SUPABASE_ROLE_KEY: process.env.SUPABASE_ROLE_KEY,
   NODE_ENV: process.env.NODE_ENV,
   DATABASE_URL: process.env.DATABASE_URL,
-  OPENROUTER_API_KEY:process.env.OPENROUTER_API_KEY
+  OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
 });

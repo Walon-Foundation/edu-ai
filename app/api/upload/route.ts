@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { nanoid } from "nanoid";
 import { db } from "@/db/db";
 import { fileTable } from "@/db/schema";
-import { eq  } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 const MAX_SIZE = 50 * 1024 * 1024;
 
@@ -22,12 +22,9 @@ export async function POST(req: NextRequest) {
       .from(fileTable)
       .where(eq(fileTable.clerkId, userId!))
       .execute();
-    
-    if(userFiles.length === 3){
-      return successResponse(
-        200,
-        "user has reached the file limit"
-      )
+
+    if (userFiles.length === 3) {
+      return successResponse(200, "user has reached the file limit");
     }
 
     const data = await req.formData();
@@ -53,7 +50,11 @@ export async function POST(req: NextRequest) {
         });
 
       if (uploadError) {
-        return errorResponse(500, uploadError, `failed to upload file ${file.name}`);
+        return errorResponse(
+          500,
+          uploadError,
+          `failed to upload file ${file.name}`,
+        );
       }
 
       const { data: signedUrlData } = await supabase.storage
@@ -66,7 +67,7 @@ export async function POST(req: NextRequest) {
           id: nanoid(20),
           clerkId: userId as string,
           fileName: file.name,
-          fileSize:`${file.size/(1024 * 1024)}mb`,
+          fileSize: `${file.size / (1024 * 1024)}mb`,
           fileUrl: signedUrlData?.signedUrl as string,
         })
         .execute();
@@ -83,7 +84,7 @@ export async function GET(req: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return  errorResponse(401, null, "User not authenticated");
+      return errorResponse(401, null, "User not authenticated");
     }
 
     // Get all files for the authenticated user
@@ -92,21 +93,12 @@ export async function GET(req: NextRequest) {
       .from(fileTable)
       .where(eq(fileTable.clerkId, userId))
       .execute();
-    
-    if(userFiles.length === 0){
-      return successResponse(
-        200,
-        "no files at yet",
-        []
-      )
+
+    if (userFiles.length === 0) {
+      return successResponse(200, "no files at yet", []);
     }
 
-    return successResponse(
-      200,
-      "User files retrieved successfully",
-      userFiles
-    );
-
+    return successResponse(200, "User files retrieved successfully", userFiles);
   } catch (error) {
     return errorResponse(500, error, "Internal server error");
   }

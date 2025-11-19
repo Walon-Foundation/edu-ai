@@ -8,17 +8,17 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { 
-  ArrowLeft, 
-  Download, 
-  Copy, 
+import {
+  ArrowLeft,
+  Download,
+  Copy,
   BookOpen,
   HelpCircle,
   FileText,
   Loader2,
   Sparkles,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
@@ -26,11 +26,11 @@ export default function GeneratePage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
-  
+
   const fileName = decodeURIComponent(params.fileName as string);
-  const fileId = searchParams.get('fileId');
-  const action = searchParams.get('action') as 'summary' | 'qa' | null;
-  
+  const fileId = searchParams.get("fileId");
+  const action = searchParams.get("action") as "summary" | "qa" | null;
+
   const [generatedContent, setGeneratedContent] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,33 +52,34 @@ export default function GeneratePage() {
       setGeneratedContent("");
 
       // Determine the correct API endpoint based on action
-      let apiEndpoint = '';
-      if (action === 'summary') {
+      let apiEndpoint = "";
+      if (action === "summary") {
         apiEndpoint = `/api/generate/${fileId}/summaries`;
-      } else if (action === 'qa') {
+      } else if (action === "qa") {
         apiEndpoint = `/api/generate/${fileId}/question-and-answer`;
       } else {
-        throw new Error('Invalid action type');
+        throw new Error("Invalid action type");
       }
 
       const response = await fetch(apiEndpoint, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Generation failed');
+        throw new Error(errorData.error || "Generation failed");
       }
 
       const result = await response.json();
-      setGeneratedContent(result.content || result.data || '');
-      
+      setGeneratedContent(result.content || result.data || "");
     } catch (error) {
-      console.error('Error generating content:', error);
-      setError(error instanceof Error ? error.message : 'Failed to generate content');
+      console.error("Error generating content:", error);
+      setError(
+        error instanceof Error ? error.message : "Failed to generate content",
+      );
     } finally {
       setLoading(false);
     }
@@ -90,21 +91,21 @@ export default function GeneratePage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      console.error('Failed to copy:', error);
+      console.error("Failed to copy:", error);
     }
   };
 
   const handleDownload = () => {
-    const blob = new Blob([generatedContent], { type: 'text/plain' });
+    const blob = new Blob([generatedContent], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
-    link.download = `${fileName.replace('.pdf', '')}-${action}-${Date.now()}.txt`;
+    link.download = `${fileName.replace(".pdf", "")}-${action}-${Date.now()}.txt`;
     link.click();
     URL.revokeObjectURL(url);
   };
 
-  const handleRegenerate = (newAction: 'summary' | 'qa') => {
+  const handleRegenerate = (newAction: "summary" | "qa") => {
     // Update URL with new action and trigger regeneration
     const newUrl = `/generate/${encodeURIComponent(fileName)}?fileId=${fileId}&action=${newAction}`;
     router.push(newUrl);
@@ -112,16 +113,16 @@ export default function GeneratePage() {
 
   const getActionDisplayName = () => {
     const names = {
-      summary: 'Summary',
-      qa: 'Questions & Answers'
+      summary: "Summary",
+      qa: "Questions & Answers",
     };
-    return names[action as keyof typeof names] || 'Content';
+    return names[action as keyof typeof names] || "Content";
   };
 
   const getActionIcon = () => {
     const icons = {
       summary: BookOpen,
-      qa: HelpCircle
+      qa: HelpCircle,
     };
     return icons[action as keyof typeof icons] || FileText;
   };
@@ -140,9 +141,13 @@ export default function GeneratePage() {
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
               Generating {getActionDisplayName()}
             </h2>
-            <p className="text-gray-600 mb-4">AI is creating your study materials from "{fileName}"</p>
+            <p className="text-gray-600 mb-4">
+              AI is creating your study materials from "{fileName}"
+            </p>
             <Progress value={45} className="w-full" />
-            <p className="text-sm text-gray-500 mt-2">This may take a few seconds...</p>
+            <p className="text-sm text-gray-500 mt-2">
+              This may take a few seconds...
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -164,12 +169,13 @@ export default function GeneratePage() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
             <div className="flex gap-2 justify-center">
-              <Button variant="outline" onClick={() => router.push('/dashboard')}>
+              <Button
+                variant="outline"
+                onClick={() => router.push("/dashboard")}
+              >
                 Back to Dashboard
               </Button>
-              <Button onClick={generateContent}>
-                Try Again
-              </Button>
+              <Button onClick={generateContent}>Try Again</Button>
             </div>
           </CardContent>
         </Card>
@@ -239,18 +245,18 @@ export default function GeneratePage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button
-                  onClick={() => handleRegenerate('summary')}
-                  variant={action === 'summary' ? 'default' : 'outline'}
+                  onClick={() => handleRegenerate("summary")}
+                  variant={action === "summary" ? "default" : "outline"}
                   className="w-full justify-start gap-2"
                   disabled={loading}
                 >
                   <BookOpen className="h-4 w-4" />
                   Summary
                 </Button>
-                
+
                 <Button
-                  onClick={() => handleRegenerate('qa')}
-                  variant={action === 'qa' ? 'default' : 'outline'}
+                  onClick={() => handleRegenerate("qa")}
+                  variant={action === "qa" ? "default" : "outline"}
                   className="w-full justify-start gap-2"
                   disabled={loading}
                 >
@@ -299,11 +305,10 @@ export default function GeneratePage() {
                           No Content Generated
                         </h3>
                         <p className="text-gray-600 mb-4">
-                          The generation process completed but no content was returned.
+                          The generation process completed but no content was
+                          returned.
                         </p>
-                        <Button onClick={generateContent}>
-                          Try Again
-                        </Button>
+                        <Button onClick={generateContent}>Try Again</Button>
                       </div>
                     )}
                   </div>
