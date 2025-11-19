@@ -1,11 +1,11 @@
-import { NextRequest } from "next/server";
-import { errorResponse, successResponse } from "@/lib/httpHelper";
 import { auth } from "@clerk/nextjs/server";
-import { supabase } from "@/lib/supabase";
+import { eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
+import type { NextRequest } from "next/server";
 import { db } from "@/db/db";
 import { fileTable } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { errorResponse, successResponse } from "@/lib/httpHelper";
+import { supabase } from "@/lib/supabase";
 
 const MAX_SIZE = 50 * 1024 * 1024;
 
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const { userId } = await auth();
 

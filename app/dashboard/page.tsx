@@ -1,8 +1,23 @@
 // app/dashboard/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import {
+  BarChart3,
+  BookOpen,
+  Calendar,
+  FileText,
+  HelpCircle,
+  Layers,
+  Plus,
+  Search,
+  Sparkles,
+  Trash2,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,25 +25,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { toast } from "react-toastify";
-import {
-  FileText,
-  Trash2,
-  BookOpen,
-  HelpCircle,
-  Layers,
-  Plus,
-  Sparkles,
-  Calendar,
-  BarChart3,
-  Search,
-  Menu,
-  X,
-} from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface UserFile {
   id: string;
@@ -47,13 +45,13 @@ export default function Dashboard() {
   } | null>(null);
   const [deletingFiles, setDeletingFiles] = useState<Set<string>>(new Set()); // Track files being deleted
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterStatus, setFilterStatus] = useState<string>("all");
-  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [_filterStatus, _setFilterStatus] = useState<string>("all");
+  const [_isMobileFilterOpen, _setIsMobileFilterOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     fetchUserFiles();
-  }, []);
+  }, [fetchUserFiles]);
 
   const fetchUserFiles = async () => {
     try {
@@ -80,7 +78,7 @@ export default function Dashboard() {
     }
   };
 
-  const handleDeleteFile = async (fileId: string, fileName: string) => {
+  const handleDeleteFile = async (fileId: string, _fileName: string) => {
     if (!confirm("Are you sure you want to delete this file?")) return;
 
     try {
@@ -97,7 +95,7 @@ export default function Dashboard() {
       } else {
         toast.error("Failed to delete file");
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("Error deleting file");
     } finally {
       // Remove file from deleting set
@@ -137,7 +135,7 @@ export default function Dashboard() {
     });
   };
 
-  const getStatusBadge = (file: UserFile) => {
+  const getStatusBadge = (_file: UserFile) => {
     // Since we removed status, all files are considered "ready"
     return (
       <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-xs">

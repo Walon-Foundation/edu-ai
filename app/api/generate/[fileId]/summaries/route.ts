@@ -1,18 +1,18 @@
-import { db } from "@/db/db";
-import { fileTable } from "@/db/schema";
-import { errorResponse, successResponse } from "@/lib/httpHelper";
-import { supabase } from "@/lib/supabase";
 import { auth } from "@clerk/nextjs/server";
 import { and, eq } from "drizzle-orm";
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
+import { db } from "@/db/db";
+import { fileTable } from "@/db/schema";
 import { env } from "@/lib/env";
+import { errorResponse, successResponse } from "@/lib/httpHelper";
+import { supabase } from "@/lib/supabase";
 
 // Assuming you have an environment variable for your OpenRouter API Key
 const OPENROUTER_API_KEY = env.OPENROUTER_API_KEY;
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 export async function GET(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ fileId: string }> },
 ) {
   try {

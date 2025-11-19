@@ -1,26 +1,21 @@
 // app/generate/[fileName]/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
-import { useParams, useSearchParams, useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import {
-  ArrowLeft,
-  Download,
-  Copy,
+  AlertCircle,
   BookOpen,
-  HelpCircle,
   FileText,
+  HelpCircle,
   Loader2,
   Sparkles,
-  CheckCircle2,
-  AlertCircle,
 } from "lucide-react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function GeneratePage() {
   const params = useParams();
@@ -34,7 +29,7 @@ export default function GeneratePage() {
   const [generatedContent, setGeneratedContent] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [_copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (fileId && action) {
@@ -43,7 +38,7 @@ export default function GeneratePage() {
       setError("Missing file ID or action type");
       setLoading(false);
     }
-  }, [fileId, action]);
+  }, [fileId, action, generateContent]);
 
   const generateContent = async () => {
     try {
@@ -85,7 +80,7 @@ export default function GeneratePage() {
     }
   };
 
-  const handleCopy = async () => {
+  const _handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(generatedContent);
       setCopied(true);
@@ -95,7 +90,7 @@ export default function GeneratePage() {
     }
   };
 
-  const handleDownload = () => {
+  const _handleDownload = () => {
     const blob = new Blob([generatedContent], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -127,7 +122,7 @@ export default function GeneratePage() {
     return icons[action as keyof typeof icons] || FileText;
   };
 
-  const ActionIcon = getActionIcon();
+  const _ActionIcon = getActionIcon();
 
   if (loading) {
     return (

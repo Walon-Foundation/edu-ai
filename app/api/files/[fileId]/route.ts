@@ -1,13 +1,13 @@
-import { NextRequest } from "next/server";
-import { errorResponse, successResponse } from "@/lib/httpHelper";
-import { supabase } from "@/lib/supabase";
 import { auth } from "@clerk/nextjs/server";
+import { and, eq } from "drizzle-orm";
+import type { NextRequest } from "next/server";
 import { db } from "@/db/db";
 import { fileTable } from "@/db/schema";
-import { and, eq } from "drizzle-orm";
+import { errorResponse, successResponse } from "@/lib/httpHelper";
+import { supabase } from "@/lib/supabase";
 
 export async function DELETE(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ fileId: string }> },
 ) {
   try {
@@ -32,7 +32,7 @@ export async function DELETE(
     }
 
     // Delete file from Supabase Storage and database concurrently
-    const [supabaseResult, dbResult] = await Promise.all([
+    const [supabaseResult, _dbResult] = await Promise.all([
       supabase.storage.from("files").remove([file.fileName]),
       db
         .delete(fileTable)

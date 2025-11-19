@@ -1,7 +1,22 @@
 "use client";
 
-import { useState, useRef } from "react";
+import {
+  AlertCircle,
+  CheckCircle2,
+  CloudUpload,
+  FileText,
+  Loader2,
+  Send,
+  Upload,
+  X,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useDropzone } from "react-dropzone";
+import { toast } from "react-toastify";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -9,23 +24,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Upload,
-  FileText,
-  X,
-  CheckCircle2,
-  AlertCircle,
-  CloudUpload,
-  Loader2,
-  Send,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
 
 interface UploadedFile {
   id: string;
@@ -37,7 +37,7 @@ interface UploadedFile {
 
 export default function UploadPage() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
-  const [isDragging, setIsDragging] = useState(false);
+  const [_isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isSendingToServer, setIsSendingToServer] = useState(false);
 
@@ -159,7 +159,7 @@ export default function UploadPage() {
     const k = 1024;
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+    return `${parseFloat((bytes / k ** i).toFixed(2))} ${sizes[i]}`;
   };
 
   const getStatusIcon = (status: UploadedFile["status"]) => {
@@ -333,9 +333,7 @@ export default function UploadPage() {
                               </p>
                               <Badge
                                 variant="secondary"
-                                className={
-                                  getStatusColor(file.status) + " w-fit"
-                                }
+                                className={`${getStatusColor(file.status)} w-fit`}
                               >
                                 <span className="flex items-center gap-1 text-xs">
                                   {getStatusIcon(file.status)}

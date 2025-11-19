@@ -1,9 +1,9 @@
-import { drizzle } from "drizzle-orm/neon-http";
 import { neon, neonConfig } from "@neondatabase/serverless";
-import * as schema from "./schema";
-import { env } from "@/lib/env";
-
+import { drizzle } from "drizzle-orm/neon-http";
 import ws from "ws";
+import { env } from "@/lib/env";
+import * as schema from "./schema";
+
 neonConfig.webSocketConstructor = ws;
 
 // To work in edge environments (Cloudflare Workers, Vercel Edge, etc.), enable querying over fetch
