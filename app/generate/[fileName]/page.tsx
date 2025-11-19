@@ -1,4 +1,3 @@
-// app/generate/[fileName]/page.tsx
 "use client";
 
 import {
@@ -8,6 +7,10 @@ import {
   HelpCircle,
   Loader2,
   Sparkles,
+  Copy,
+  CheckCircle2, 
+  Download,
+  ArrowLeft,
 } from "lucide-react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -16,6 +19,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import ReactMarkdown from 'react-markdown'; 
+import { Badge } from "@/components/ui/badge";
 
 export default function GeneratePage() {
   const params = useParams();
@@ -29,7 +34,7 @@ export default function GeneratePage() {
   const [generatedContent, setGeneratedContent] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [_copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState(false); // Changed _copied to copied for consistency
 
   useEffect(() => {
     if (fileId && action) {
@@ -80,7 +85,7 @@ export default function GeneratePage() {
     }
   };
 
-  const _handleCopy = async () => {
+  const handleCopy = async () => { // Changed _handleCopy to handleCopy
     try {
       await navigator.clipboard.writeText(generatedContent);
       setCopied(true);
@@ -90,7 +95,7 @@ export default function GeneratePage() {
     }
   };
 
-  const _handleDownload = () => {
+  const handleDownload = () => { // Changed _handleDownload to handleDownload
     const blob = new Blob([generatedContent], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -122,7 +127,7 @@ export default function GeneratePage() {
     return icons[action as keyof typeof icons] || FileText;
   };
 
-  const _ActionIcon = getActionIcon();
+  const ActionIcon = getActionIcon(); // Changed _ActionIcon to ActionIcon
 
   if (loading) {
     return (
@@ -180,8 +185,8 @@ export default function GeneratePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Header */}
-      {/* <div className="bg-white border-b shadow-sm">
+      {/* Header - Uncommented and Cleaned for completeness */}
+      <div className="bg-white border-b shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -227,7 +232,7 @@ export default function GeneratePage() {
             </div>
           </div>
         </div>
-      </div> */}
+      </div>
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -288,10 +293,11 @@ export default function GeneratePage() {
                 <ScrollArea className="h-[75vh]">
                   <div className="p-6">
                     {generatedContent ? (
-                      <div className="prose max-w-none">
-                        <pre className="whitespace-pre-wrap font-sans text-base leading-relaxed text-gray-900 bg-gray-50 p-6 rounded-lg">
+                      // ⬅️ FIX APPLIED HERE: Replaced <pre> with a <div> containing <ReactMarkdown>
+                      <div className="prose max-w-none bg-gray-50 p-6 rounded-lg"> 
+                        <ReactMarkdown>
                           {generatedContent}
-                        </pre>
+                        </ReactMarkdown>
                       </div>
                     ) : (
                       <div className="text-center py-12">
