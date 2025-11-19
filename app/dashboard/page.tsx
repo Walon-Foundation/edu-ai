@@ -1,3 +1,4 @@
+// app/dashboard/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -77,7 +78,6 @@ export default function Dashboard() {
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
   useEffect(() => {
-    // Simulate API call delay
     const timer = setTimeout(() => {
       setUserFiles(demoFiles);
       setLoading(false);
@@ -99,11 +99,9 @@ export default function Dashboard() {
         const result = await response.json();
         setUserFiles(result.data || []);
       } else {
-        console.error("Failed to fetch user files");
         setUserFiles(demoFiles);
       }
     } catch (error) {
-      console.error("Error fetching user files:", error);
       setUserFiles(demoFiles);
     } finally {
       setLoading(false);
@@ -120,13 +118,10 @@ export default function Dashboard() {
 
       if (response.ok) {
         setUserFiles(prev => prev.filter(file => file.id !== fileId));
-        console.log("File deleted successfully");
       } else {
-        console.error("Failed to delete file");
         alert("Failed to delete file");
       }
     } catch (error) {
-      console.error("Error deleting file:", error);
       alert("Error deleting file");
     }
   };
@@ -136,9 +131,8 @@ export default function Dashboard() {
     
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
-      alert(`${action.charAt(0).toUpperCase() + action.slice(1)} generated successfully!\n\nThis would show the AI-generated ${action} in a real application.`);
+      alert(`${action.charAt(0).toUpperCase() + action.slice(1)} generated successfully!`);
     } catch (error) {
-      console.error(`Error generating ${action}:`, error);
       alert(`Error generating ${action}`);
     } finally {
       setSelectedAction(null);
@@ -184,7 +178,6 @@ export default function Dashboard() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading your documents...</p>
-          <p className="text-sm text-gray-500 mt-2">Preparing your AI study materials</p>
         </div>
       </div>
     );
@@ -208,7 +201,7 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* Stats Cards - Responsive Grid */}
+        {/* Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4 mb-6 sm:mb-8">
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
             <CardContent className="p-3 sm:p-4">
@@ -263,9 +256,7 @@ export default function Dashboard() {
         <Card className="mb-4 sm:mb-6 border-0 shadow-sm">
           <CardContent className="p-3 sm:p-4">
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center justify-between">
-              {/* Search and Filter Section */}
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
-                {/* Search Input */}
                 <div className="relative flex-1 min-w-0">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                   <Input
@@ -276,7 +267,6 @@ export default function Dashboard() {
                   />
                 </div>
                 
-                {/* Desktop Filter */}
                 <div className="hidden sm:block">
                   <select 
                     value={filterStatus}
@@ -290,7 +280,6 @@ export default function Dashboard() {
                   </select>
                 </div>
 
-                {/* Mobile Filter Button */}
                 <div className="sm:hidden">
                   <Button
                     variant="outline"
@@ -304,7 +293,6 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Upload Button */}
               <Button 
                 onClick={() => window.location.href = '/upload'} 
                 className="gap-2 w-full sm:w-auto justify-center"
@@ -316,7 +304,6 @@ export default function Dashboard() {
               </Button>
             </div>
 
-            {/* Mobile Filter Dropdown */}
             {isMobileFilterOpen && (
               <div className="sm:hidden mt-3 p-3 bg-gray-50 rounded-lg">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -375,14 +362,14 @@ export default function Dashboard() {
                   Click on any action button to generate AI-powered study materials
                 </CardDescription>
               </CardHeader>
-              <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-                <ScrollArea className="h-[500px] sm:h-[600px] pr-2 sm:pr-4">
-                  <div className="space-y-3 sm:space-y-4">
+              <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
+                <ScrollArea className="h-[500px] sm:h-[600px]">
+                  <div className="space-y-3 sm:space-y-4 pr-2">
                     {filteredFiles.map((file) => (
-                      <Card key={file.id} className="p-4 sm:p-6 hover:shadow-md transition-all duration-200 border border-gray-100">
-                        <div className="flex flex-col gap-4">
-                          {/* File Header */}
-                          <div className="flex items-start gap-3 sm:gap-4">
+                      <Card key={file.id} className="p-3 sm:p-4 hover:shadow-md transition-all duration-200 border border-gray-100">
+                        <div className="flex flex-col gap-3">
+                          {/* File Header - Compact on mobile */}
+                          <div className="flex items-start gap-3">
                             <div className="relative flex-shrink-0">
                               <FileText className="h-8 w-8 sm:h-10 sm:h-12 text-red-500" />
                               {file.status === "processing" && (
@@ -394,51 +381,51 @@ export default function Dashboard() {
                             </div>
                             
                             <div className="flex-1 min-w-0">
-                              {/* File Name and Badges */}
-                              <div className="flex flex-col gap-2 mb-2">
-                                <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
-                                  {file.fileName}
-                                </h3>
-                                <div className="flex flex-wrap gap-2">
-                                  {getStatusBadge(file.status)}
-                                  <Badge variant="secondary" className="bg-gray-100 text-xs">
-                                    {file.fileSize}
-                                  </Badge>
-                                </div>
+                              {/* File Name - Proper truncation */}
+                              <h3 className="font-semibold text-gray-900 text-sm sm:text-base leading-tight break-words mb-1">
+                                {file.fileName}
+                              </h3>
+                              
+                              {/* Badges - Stack on mobile */}
+                              <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
+                                {getStatusBadge(file.status)}
+                                <Badge variant="secondary" className="bg-gray-100 text-xs">
+                                  {file.fileSize}
+                                </Badge>
                               </div>
                               
                               {/* Upload Date */}
-                              <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">
-                                <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
-                                <span>Uploaded {formatDate(file.createdAt)}</span>
+                              <div className="flex items-center gap-1 text-xs text-gray-500 mb-2">
+                                <Calendar className="h-3 w-3 flex-shrink-0" />
+                                <span className="truncate">Uploaded {formatDate(file.createdAt)}</span>
                               </div>
 
                               {/* Processing Progress */}
                               {file.status === "processing" && (
-                                <div className="mb-3 sm:mb-4">
-                                  <div className="flex justify-between text-xs sm:text-sm text-gray-600 mb-1">
+                                <div className="mb-2">
+                                  <div className="flex justify-between text-xs text-gray-600 mb-1">
                                     <span>AI Processing</span>
                                     <span>65%</span>
                                   </div>
-                                  <Progress value={65} className="h-1.5 sm:h-2" />
+                                  <Progress value={65} className="h-1.5" />
                                 </div>
                               )}
                             </div>
                           </div>
                           
-                          {/* Action Buttons */}
-                          <div className="flex flex-col sm:flex-row gap-2">
-                            {/* AI Action Buttons */}
-                            <div className="flex flex-col xs:flex-row gap-2 flex-1">
+                          {/* Action Buttons - Improved mobile layout */}
+                          <div className="flex flex-col gap-2">
+                            {/* AI Action Buttons - Grid layout on mobile */}
+                            <div className="grid grid-cols-1 xs:grid-cols-3 gap-2">
                               <Button
                                 onClick={() => handleGenerateContent(file.id, 'summary')}
                                 disabled={selectedAction?.fileId === file.id && selectedAction?.action === 'summary' || file.status !== "processed"}
                                 variant="outline"
-                                className="gap-2 flex-1 justify-center"
+                                className="gap-1 sm:gap-2 justify-center h-8 sm:h-9"
                                 size="sm"
                               >
-                                <BookOpen className="h-3 w-3 sm:h-4 sm:w-4" />
-                                <span className="text-xs sm:text-sm">
+                                <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                                <span className="text-xs sm:text-sm truncate">
                                   {selectedAction?.fileId === file.id && selectedAction?.action === 'summary' ? "Generating..." : "Summaries"}
                                 </span>
                               </Button>
@@ -447,11 +434,11 @@ export default function Dashboard() {
                                 onClick={() => handleGenerateContent(file.id, 'flashcards')}
                                 disabled={selectedAction?.fileId === file.id && selectedAction?.action === 'flashcards' || file.status !== "processed"}
                                 variant="outline"
-                                className="gap-2 flex-1 justify-center"
+                                className="gap-1 sm:gap-2 justify-center h-8 sm:h-9"
                                 size="sm"
                               >
-                                <Layers className="h-3 w-3 sm:h-4 sm:w-4" />
-                                <span className="text-xs sm:text-sm">
+                                <Layers className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                                <span className="text-xs sm:text-sm truncate">
                                   {selectedAction?.fileId === file.id && selectedAction?.action === 'flashcards' ? "Generating..." : "Flashcards"}
                                 </span>
                               </Button>
@@ -460,37 +447,37 @@ export default function Dashboard() {
                                 onClick={() => handleGenerateContent(file.id, 'qa')}
                                 disabled={selectedAction?.fileId === file.id && selectedAction?.action === 'qa' || file.status !== "processed"}
                                 variant="outline"
-                                className="gap-2 flex-1 justify-center"
+                                className="gap-1 sm:gap-2 justify-center h-8 sm:h-9"
                                 size="sm"
                               >
-                                <HelpCircle className="h-3 w-3 sm:h-4 sm:w-4" />
-                                <span className="text-xs sm:text-sm">
+                                <HelpCircle className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                                <span className="text-xs sm:text-sm truncate">
                                   {selectedAction?.fileId === file.id && selectedAction?.action === 'qa' ? "Generating..." : "Q&A"}
                                 </span>
                               </Button>
                             </div>
 
-                            {/* Utility Buttons */}
-                            <div className="flex gap-2 justify-center sm:justify-start">
+                            {/* Utility Buttons - Side by side on mobile */}
+                            <div className="flex gap-2">
                               <Button
                                 onClick={() => window.open(file.fileUrl, '_blank')}
                                 variant="ghost"
                                 size="sm"
-                                className="gap-1 sm:gap-2 flex-1 sm:flex-none"
+                                className="gap-1 sm:gap-2 flex-1 justify-center h-8 sm:h-9"
                                 disabled={file.status !== "processed"}
                               >
-                                <Download className="h-3 w-3 sm:h-4 sm:w-4" />
-                                <span className="text-xs sm:text-sm hidden xs:inline">Download</span>
+                                <Download className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                                <span className="text-xs sm:text-sm">Download</span>
                               </Button>
 
                               <Button
                                 onClick={() => handleDeleteFile(file.id, file.fileName)}
                                 variant="ghost"
                                 size="sm"
-                                className="gap-1 sm:gap-2 flex-1 sm:flex-none text-red-600 hover:text-red-700 hover:bg-red-50"
+                                className="gap-1 sm:gap-2 flex-1 justify-center h-8 sm:h-9 text-red-600 hover:text-red-700 hover:bg-red-50"
                               >
-                                <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                                <span className="text-xs sm:text-sm hidden xs:inline">Delete</span>
+                                <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                                <span className="text-xs sm:text-sm">Delete</span>
                               </Button>
                             </div>
                           </div>
