@@ -1,11 +1,20 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+// import { NextResponse } from "next/server";
 
-// The exported function remains the same. It is now automatically
-// treated as the default 'proxy' handler by Next.js.
-export default clerkMiddleware();
+const isPublicRoute = createRouteMatcher([
+  "/",
+  "/howitworks",
+  "/sign-in(.*)",
+  "/sign-up(.*)",
+]);
 
-// The 'config' object and its 'matcher' property are still used
-// by Next.js to determine which paths the proxy should run on.
+export default clerkMiddleware(async(auth, req) => {
+  // const url = '/sign-in'
+  if (!isPublicRoute(req)) {
+    await auth.protect()
+  }
+});
+
 export const config = {
   matcher: [
     // Skip Next.js internals and all static files, unless found in search params
