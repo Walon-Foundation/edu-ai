@@ -3,61 +3,68 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useClerk, useUser } from "@clerk/nextjs";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Default to false
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
-  // Check authentication status on component mount
+  const { isSignedIn, user } = useUser();
+  const clerk = useClerk();
+
   useEffect(() => {
-    // In a real app, you would check authentication status here
-    // For demo purposes, we'll check if user is on dashboard or has auth token
-    const checkAuth = async () => {
-      // Simulate auth check - replace with your actual auth logic
-      const token = localStorage.getItem('auth-token'); // or use your auth context
-      setIsLoggedIn(!!token);
-    };
-    
-    checkAuth();
-  }, []);
+    setIsLoggedIn(!!isSignedIn);
+  }, [isSignedIn]);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
 
-  const handleSignOut = () => {
-    // Clear authentication
-    localStorage.removeItem('auth-token');
-    setIsLoggedIn(false);
-    setIsProfileOpen(false);
-    router.push('/');
+  const handleSignOut = async () => {
+    try {
+      await clerk.signOut();
+      setIsLoggedIn(false);
+      setIsProfileOpen(false);
+      router.push('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
-  const handleSignIn = () => {
-    // Simulate sign in - replace with your actual sign in logic
-    localStorage.setItem('auth-token', 'demo-token');
-    setIsLoggedIn(true);
-    router.push('/dashboard');
+  const getUserInitials = () => {
+    if (!user) return 'U';
+    const firstName = user.firstName || '';
+    const lastName = user.lastName || '';
+    if (firstName || lastName) {
+      return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+    }
+    return user.emailAddresses[0]?.emailAddress?.charAt(0).toUpperCase() || 'U';
+  };
+
+  const getUserName = () => {
+    if (!user) return 'User';
+    if (user.firstName && user.lastName) {
+      return `${user.firstName} ${user.lastName}`;
+    }
+    return user.firstName || user.username || 'User';
   };
 
   return (
-    <nav className="bg-white shadow-sm border-b">
+    <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200/60 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <Link
-                href="/"
-                className="text-2xl font-bold text-indigo-600 hover:text-indigo-700 transition-colors"
-              >
-                EduAI
-              </Link>
-            </div>
+            <Link
+              href="/"
+              className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent hover:from-indigo-700 hover:to-purple-700 transition-all duration-200"
+            >
+              EduAI
+            </Link>
           </div>
 
-          {/* Desktop Navigation Links - Changes based on auth state */}
+          {/* Desktop Navigation Links */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
               {isLoggedIn ? (
@@ -65,13 +72,13 @@ export default function Navbar() {
                 <>
                   <Link
                     href="/dashboard"
-                    className="text-gray-900 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                    className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-indigo-50"
                   >
                     Dashboard
                   </Link>
                   <Link
                     href="/upload"
-                    className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                    className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-indigo-50"
                   >
                     Upload PDF
                   </Link>
@@ -81,28 +88,16 @@ export default function Navbar() {
                 <>
                   <Link
                     href="/"
-                    className="text-gray-900 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                    className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-indigo-50"
                   >
                     Home
                   </Link>
-                  {/* <Link
-                    href="/features"
-                    className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                  >
-                    Features
-                  </Link> */}
                   <Link
                     href="/howitworks"
-                    className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                    className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-indigo-50"
                   >
                     How It Works
                   </Link>
-                  {/* <Link
-                    href="/pricing"
-                    className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                  >
-                    Pricing
-                  </Link> */}
                 </>
               )}
             </div>
@@ -111,20 +106,27 @@ export default function Navbar() {
           {/* Auth Buttons / Profile */}
           <div className="hidden md:flex items-center space-x-4">
             {isLoggedIn ? (
-              /* Profile Dropdown for logged in users */
+              /* Profile Dropdown */
               <div className="relative">
                 <button
                   onClick={toggleProfile}
-                  className="flex items-center space-x-2 text-gray-700 hover:text-indigo-600 transition-colors focus:outline-none"
+                  className="flex items-center space-x-3 px-3 py-2 rounded-lg border border-gray-200 bg-white hover:border-indigo-300 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
-                  <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                    <span className="text-indigo-600 font-semibold text-sm">
-                      U
+                  <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-sm">
+                    <span className="text-white font-semibold text-sm">
+                      {getUserInitials()}
                     </span>
                   </div>
-                  <span className="text-sm font-medium">Profile</span>
+                  <div className="text-left">
+                    <p className="text-sm font-medium text-gray-900 leading-none">
+                      {getUserName()}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {user?.primaryEmailAddress?.emailAddress}
+                    </p>
+                  </div>
                   <svg
-                    className={`w-4 h-4 transition-transform ${isProfileOpen ? "rotate-180" : ""}`}
+                    className={`w-4 h-4 text-gray-400 transition-transform ${isProfileOpen ? "rotate-180" : ""}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -140,33 +142,20 @@ export default function Navbar() {
 
                 {/* Dropdown Menu */}
                 {isProfileOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                    <Link
-                      href="/dashboard"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
-                      onClick={() => setIsProfileOpen(false)}
-                    >
-                      Dashboard
-                    </Link>
-                    <Link
-                      href="/profile"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
-                      onClick={() => setIsProfileOpen(false)}
-                    >
-                      My Profile
-                    </Link>
-                    <Link
-                      href="/upload"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
-                      onClick={() => setIsProfileOpen(false)}
-                    >
-                      Upload New
-                    </Link>
-                    <div className="border-t border-gray-100 my-1"></div>
+                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg py-2 z-50 border border-gray-200/60 backdrop-blur-md">
+                    <div className="px-4 py-3 border-b border-gray-100">
+                      <p className="text-sm font-medium text-gray-900">{getUserName()}</p>
+                      <p className="text-xs text-gray-500 truncate mt-0.5">
+                        {user?.primaryEmailAddress?.emailAddress}
+                      </p>
+                    </div>
                     <button
                       onClick={handleSignOut}
-                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                      className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
                     >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
                       Sign Out
                     </button>
                   </div>
@@ -174,58 +163,50 @@ export default function Navbar() {
               </div>
             ) : (
               /* Auth Buttons for logged out users */
-              <>
-                <button
-                  onClick={handleSignIn}
-                  className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  Sign In
-                </button>
-                <button
-                  onClick={handleSignIn}
-                  className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors"
-                >
-                  Get Started
-                </button>
-              </>
+              <div className="flex items-center space-x-3">
+                <Link href="/sign-in">
+                  <button className="text-gray-700 hover:text-indigo-600 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-gray-50">
+                    Sign In
+                  </button>
+                </Link>
+                <Link href="/sign-up">
+                  <button className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                    Get Started
+                  </button>
+                </Link>
+              </div>
             )}
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center space-x-2">
+          <div className="md:hidden flex items-center space-x-3">
             {isLoggedIn && (
               <div className="relative">
                 <button
                   onClick={toggleProfile}
-                  className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center"
+                  className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-sm"
                 >
-                  <span className="text-indigo-600 font-semibold text-sm">
-                    U
+                  <span className="text-white font-semibold text-sm">
+                    {getUserInitials()}
                   </span>
                 </button>
 
                 {/* Mobile Dropdown Menu */}
                 {isProfileOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                    <Link
-                      href="/dashboard"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
-                      onClick={() => setIsProfileOpen(false)}
-                    >
-                      Dashboard
-                    </Link>
-                    <Link
-                      href="/profile"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
-                      onClick={() => setIsProfileOpen(false)}
-                    >
-                      My Profile
-                    </Link>
-                    <div className="border-t border-gray-100 my-1"></div>
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg py-2 z-50 border border-gray-200/60 backdrop-blur-md">
+                    <div className="px-4 py-3 border-b border-gray-100">
+                      <p className="text-sm font-medium text-gray-900">{getUserName()}</p>
+                      <p className="text-xs text-gray-500 truncate mt-0.5">
+                        {user?.primaryEmailAddress?.emailAddress}
+                      </p>
+                    </div>
                     <button
                       onClick={handleSignOut}
-                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                      className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
                     >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
                       Sign Out
                     </button>
                   </div>
@@ -235,7 +216,7 @@ export default function Navbar() {
 
             <button
               onClick={toggleMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+              className="inline-flex items-center justify-center p-2 rounded-lg text-gray-400 hover:text-gray-500 hover:bg-gray-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
               <svg
                 className="h-6 w-6"
@@ -265,51 +246,33 @@ export default function Navbar() {
 
         {/* Mobile Navigation Menu */}
         {isMenuOpen && (
-          <div className="md:hidden border-t border-gray-200">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white">
+          <div className="md:hidden border-t border-gray-200/60 bg-white/95 backdrop-blur-md">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               {isLoggedIn ? (
                 // Mobile menu for logged in users
                 <>
                   <Link
                     href="/dashboard"
-                    className="text-gray-900 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+                    className="text-gray-700 hover:text-indigo-600 block px-3 py-3 rounded-lg text-base font-medium transition-all duration-200 hover:bg-indigo-50"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Dashboard
                   </Link>
                   <Link
                     href="/upload"
-                    className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+                    className="text-gray-700 hover:text-indigo-600 block px-3 py-3 rounded-lg text-base font-medium transition-all duration-200 hover:bg-indigo-50"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Upload PDF
                   </Link>
-                  {/* <Link
-                    href="/documents"
-                    className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    My Documents
-                  </Link>
-                  <Link
-                    href="/history"
-                    className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    History
-                  </Link> */}
-                  <div className="pt-4 pb-3 border-t border-gray-200">
-                    <Link
-                      href="/profile"
-                      className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      My Profile
-                    </Link>
+                  <div className="border-t border-gray-200/60 mt-2 pt-2">
                     <button
                       onClick={handleSignOut}
-                      className="text-red-600 hover:bg-red-50 block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors mt-2"
+                      className="text-red-600 hover:bg-red-50 block w-full text-left px-3 py-3 rounded-lg text-base font-medium transition-all duration-200 flex items-center gap-2"
                     >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
                       Sign Out
                     </button>
                   </div>
@@ -319,45 +282,29 @@ export default function Navbar() {
                 <>
                   <Link
                     href="/"
-                    className="text-gray-900 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+                    className="text-gray-700 hover:text-indigo-600 block px-3 py-3 rounded-lg text-base font-medium transition-all duration-200 hover:bg-indigo-50"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Home
                   </Link>
-                  {/* <Link
-                    href="/features"
-                    className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Features
-                  </Link> */}
                   <Link
                     href="/howitworks"
-                    className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+                    className="text-gray-700 hover:text-indigo-600 block px-3 py-3 rounded-lg text-base font-medium transition-all duration-200 hover:bg-indigo-50"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     How It Works
                   </Link>
-                  {/* <Link
-                    href="/pricing"
-                    className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Pricing
-                  </Link> */}
-                  <div className="pt-4 pb-3 border-t border-gray-200">
-                    <button
-                      onClick={handleSignIn}
-                      className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
-                    >
-                      Sign In
-                    </button>
-                    <button
-                      onClick={handleSignIn}
-                      className="bg-indigo-600 text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-700 transition-colors mt-2"
-                    >
-                      Get Started
-                    </button>
+                  <div className="border-t border-gray-200/60 mt-2 pt-2 space-y-2">
+                    <Link href="/sign-in">
+                      <button className="text-gray-700 hover:text-indigo-600 block w-full text-left px-3 py-3 rounded-lg text-base font-medium transition-all duration-200 hover:bg-gray-50">
+                        Sign In
+                      </button>
+                    </Link>
+                    <Link href="/sign-up">
+                      <button className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white block w-full text-left px-3 py-3 rounded-lg text-base font-medium hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-sm">
+                        Get Started
+                      </button>
+                    </Link>
                   </div>
                 </>
               )}
@@ -369,7 +316,7 @@ export default function Navbar() {
       {/* Overlay to close dropdowns when clicking outside */}
       {(isProfileOpen || isMenuOpen) && (
         <div
-          className="fixed inset-0 z-40"
+          className="fixed inset-0 z-40 bg-black/10 backdrop-blur-sm"
           onClick={() => {
             setIsProfileOpen(false);
             setIsMenuOpen(false);
