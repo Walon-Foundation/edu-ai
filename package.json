@@ -11,8 +11,7 @@
     "db:studio": "npx drizzle-kit studio",
     "start": "next start",
     "lint": "biome check",
-    "format": "biome format --write",
-    "fix": "biome check --write --unsafe --max-diagnostics=100"
+    "format": "biome format --write"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.35.1",

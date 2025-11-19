@@ -38,7 +38,7 @@ export default function GeneratePage() {
       setError("Missing file ID or action type");
       setLoading(false);
     }
-  }, [fileId, action, generateContent]);
+  }, [fileId, action]);
 
   const generateContent = async () => {
     try {

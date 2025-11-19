@@ -51,7 +51,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchUserFiles();
-  }, [fetchUserFiles]);
+  }, []);
 
   const fetchUserFiles = async () => {
     try {
