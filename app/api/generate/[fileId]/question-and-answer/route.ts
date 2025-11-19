@@ -69,17 +69,18 @@ export async function GET(
           content: [
             {
               type: "text",
-              text: `
-                              You are an expert at creating high-quality learning questions and answers. Your Q&A must:
-                            **REQUIREMENTS:**
-                            - Create 10-15 thoughtful questions that test real understanding
-                            - Focus on the most important concepts from the text
-                            - Questions should require meaningful understanding, not just recall
-                            - Answers should be clear, accurate, and directly based on the text
-                            - Format: Simple Q: and A: format
-                            - Cover different aspects: concepts, applications, relationships
-                            - Questions should help someone learn and understand the material deeply
-                            Use the text below to do the above task  `,
+              text: `You are an expert at creating high-quality learning questions and answers. Analyze the provided text and generate a set of 20 thoughtful questions and their corresponding answers.
+                **REQUIREMENTS FOR Q&A GENERATION:**
+
+                1.  **Quantity:** Create exactly 20 Q&A pairs.
+                2.  **Focus:** Concentrate on the **most important concepts, core principles, and relationships** detailed in the text.
+                3.  **Depth:** Questions must require **meaningful understanding** (analysis, application, implication) rather than simple verbatim recall.
+                4.  **Accuracy:** Answers must be **clear, accurate, and directly substantiated** by the source text.
+                5.  **Coverage:** Ensure the questions cover different aspects of the material, including **concepts, applications, and organizational relationships**.
+                6.  **Format:** Output the results using a clean, simple, and direct format:
+                    ### [Q#]: [Question Text]?
+                    > [Answer Text].
+                    ---`
             },
             {
               // Correct structure for sending a PDF document via Base64 using 'file' type

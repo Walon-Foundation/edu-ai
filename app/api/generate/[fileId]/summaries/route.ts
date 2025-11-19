@@ -69,16 +69,17 @@ export async function GET(
           content: [
             {
               type: "text",
-              text: `
-                                Create a highly concise executive summary of the document provided. Follow these strict guidelines:
-                                **REQUIREMENTS:**
-                                - Maximum 150-200 words
-                                - Focus ONLY on core concepts and main arguments
-                                - Omit examples, anecdotes, and minor details
-                                - Use clear, direct language
-                                - Structure: Overview → Key Points → Conclusion
-                                - Note: do not add any unnecessary material, key the summary related to the pdf provided
-                            `,
+              text: `Generate an executive summary of the document provided, prioritizing clarity, accuracy, and conciseness above all else. The output MUST strictly adhere to the following three-part structure and formatting:
+                # Executive Summary
+
+                ## Overview
+                [1-2 sentences setting the document context and primary purpose.]
+
+                ## Key Points
+                [A list of the most critical arguments or findings, using bullet points.]
+
+                ## Conclusion
+                [1-2 sentences summarizing the final implication or takeaway.]`
             },
             {
               // Correct structure for sending a PDF document via Base64 using 'file' type
