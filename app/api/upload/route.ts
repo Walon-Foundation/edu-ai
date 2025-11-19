@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      errorResponse(401, null, "user not authenticated");
+      return errorResponse(401, null, "user not authenticated");
     }
 
     const userFiles = await db
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
       .execute();
     
     if(userFiles.length === 3){
-      successResponse(
+      return successResponse(
         200,
         "user has reached the file limit"
       )
@@ -34,12 +34,12 @@ export async function POST(req: NextRequest) {
     const files = data.getAll("files") as File[];
 
     if (!files || files.length === 0) {
-      errorResponse(400, null, "invalid form data");
+      return errorResponse(400, null, "invalid form data");
     }
 
     for (const file of files) {
       if (file.size > MAX_SIZE) {
-        errorResponse(400, null, "file is larger than 50mb");
+        return errorResponse(400, null, "file is larger than 50mb");
       }
 
       const bytes = await file.arrayBuffer();
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
         });
 
       if (uploadError) {
-        errorResponse(500, uploadError, `failed to upload file ${file.name}`);
+        return errorResponse(500, uploadError, `failed to upload file ${file.name}`);
       }
 
       const { data: signedUrlData } = await supabase.storage
@@ -72,9 +72,9 @@ export async function POST(req: NextRequest) {
         .execute();
     }
 
-    successResponse(200, "all files uploaded");
+    return successResponse(200, "all files uploaded");
   } catch (error) {
-    errorResponse(500, error, "internal sever error");
+    return errorResponse(500, error, "internal sever error");
   }
 }
 
@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return errorResponse(401, null, "User not authenticated");
+      return  errorResponse(401, null, "User not authenticated");
     }
 
     // Get all files for the authenticated user
@@ -94,20 +94,20 @@ export async function GET(req: NextRequest) {
       .execute();
     
     if(userFiles.length === 0){
-      successResponse(
+      return successResponse(
         200,
         "no files at yet",
         []
       )
     }
 
-    successResponse(
+    return successResponse(
       200,
       "User files retrieved successfully",
       userFiles
     );
 
   } catch (error) {
-    errorResponse(500, error, "Internal server error");
+    return errorResponse(500, error, "Internal server error");
   }
 }

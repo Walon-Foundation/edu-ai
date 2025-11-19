@@ -4,6 +4,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+import {ToastContainer } from "react-toastify"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,7 +19,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Edu-Ai",
   description:
-    "An educational app the let ai summaries pdf, generate flash cards, questions and more..",
+    "An educational app that's let ai summaries pdf, generate flash cards, questions and more..",
 };
 
 export default function RootLayout({
@@ -33,6 +34,7 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <Navbar />
+             <ToastContainer autoClose={5000} position="bottom-right" closeOnClick={true} hideProgressBar={false} newestOnTop={true}/>
           {children}
           <Footer />
         </body>

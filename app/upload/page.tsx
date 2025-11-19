@@ -24,6 +24,8 @@ import {
   Loader2,
   Send,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 interface UploadedFile {
   id: string;
@@ -38,6 +40,8 @@ export default function UploadPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isSendingToServer, setIsSendingToServer] = useState(false);
+
+  const router = useRouter()
 
   const onDrop = (acceptedFiles: File[]) => {
     setIsDragging(false);
@@ -128,10 +132,6 @@ export default function UploadPage() {
         formData.append("files", fileInfo.file);
       });
 
-      // Add any additional data you want to send
-      // formData.append('userId', 'user-id-here'); // Replace with actual user ID
-      // formData.append('timestamp', new Date().toISOString());
-
       // Send to your backend API
       const response = await fetch("/api/upload", {
         method: "POST",
@@ -142,14 +142,13 @@ export default function UploadPage() {
         throw new Error("Failed to upload files");
       }
 
-      const result = await response.json();
-      console.log("Upload successful:", result);
+      router.push("/dashboard")
 
       // Show success message
-      alert("Files successfully uploaded to server!");
+      toast.success("Files successfully uploaded to server!");
     } catch (error) {
       console.error("Error uploading files:", error);
-      alert("Error uploading files. Please try again.");
+      toast.error("Error uploading files. Please try again.");
     } finally {
       setIsSendingToServer(false);
     }
