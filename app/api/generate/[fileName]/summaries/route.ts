@@ -63,7 +63,7 @@ export async function POST(req:NextRequest, {params}:{params:Promise<{fileName:s
                 }
             ],
             stream:false,
-            maxTokens:2000
+            // maxTokens:2000
         })
 
         const aiResult = completion.choices[0].message.content  
