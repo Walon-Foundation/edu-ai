@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
           id: nanoid(20),
           clerkId: userId as string,
           fileName: file.name,
-          fileSize:`${file.size}mb`,
+          fileSize:`${file.size/(1024 * 1024)}mb`,
           fileUrl: signedUrlData?.signedUrl as string,
         })
         .execute();
