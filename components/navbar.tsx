@@ -75,18 +75,6 @@ export default function Navbar() {
                   >
                     Upload PDF
                   </Link>
-                  <Link
-                    href="/documents"
-                    className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                  >
-                    My Documents
-                  </Link>
-                  <Link
-                    href="/history"
-                    className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                  >
-                    History
-                  </Link>
                 </>
               ) : (
                 // Navigation for logged out users
@@ -97,24 +85,24 @@ export default function Navbar() {
                   >
                     Home
                   </Link>
-                  <Link
+                  {/* <Link
                     href="/features"
                     className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
                   >
                     Features
-                  </Link>
+                  </Link> */}
                   <Link
                     href="/howitworks"
                     className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
                   >
                     How It Works
                   </Link>
-                  <Link
+                  {/* <Link
                     href="/pricing"
                     className="text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
                   >
                     Pricing
-                  </Link>
+                  </Link> */}
                 </>
               )}
             </div>
@@ -296,7 +284,7 @@ export default function Navbar() {
                   >
                     Upload PDF
                   </Link>
-                  <Link
+                  {/* <Link
                     href="/documents"
                     className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
                     onClick={() => setIsMenuOpen(false)}
@@ -309,7 +297,7 @@ export default function Navbar() {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     History
-                  </Link>
+                  </Link> */}
                   <div className="pt-4 pb-3 border-t border-gray-200">
                     <Link
                       href="/profile"
@@ -336,13 +324,13 @@ export default function Navbar() {
                   >
                     Home
                   </Link>
-                  <Link
+                  {/* <Link
                     href="/features"
                     className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Features
-                  </Link>
+                  </Link> */}
                   <Link
                     href="/howitworks"
                     className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
@@ -350,13 +338,13 @@ export default function Navbar() {
                   >
                     How It Works
                   </Link>
-                  <Link
+                  {/* <Link
                     href="/pricing"
                     className="text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Pricing
-                  </Link>
+                  </Link> */}
                   <div className="pt-4 pb-3 border-t border-gray-200">
                     <button
                       onClick={handleSignIn}

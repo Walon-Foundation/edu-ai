@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -76,6 +77,7 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const router = useRouter()
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -126,14 +128,18 @@ export default function Dashboard() {
     }
   };
 
-  const handleGenerateContent = async (fileId: string, action: string) => {
+
+  const handleGenerateContent = async (fileId: string, fileName: string, action: string) => {
     setSelectedAction({ fileId, action });
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      alert(`${action.charAt(0).toUpperCase() + action.slice(1)} generated successfully!`);
+      // Navigate immediately to the generate page with the action
+      router.push(`/generate/${fileName}?action=${action}&fileId=${fileId}`);
+      
+      // The actual generation will happen on the generate page
     } catch (error) {
-      alert(`Error generating ${action}`);
+      console.error(`Error navigating to generate page:`, error);
+      alert(`Error starting generation. Please try again.`);
     } finally {
       setSelectedAction(null);
     }
@@ -418,7 +424,7 @@ export default function Dashboard() {
                             {/* AI Action Buttons - Grid layout on mobile */}
                             <div className="grid grid-cols-1 xs:grid-cols-3 gap-2">
                               <Button
-                                onClick={() => handleGenerateContent(file.id, 'summary')}
+                                onClick={() => handleGenerateContent(file.id, file.fileName, 'summary')}
                                 disabled={selectedAction?.fileId === file.id && selectedAction?.action === 'summary' || file.status !== "processed"}
                                 variant="outline"
                                 className="gap-1 sm:gap-2 justify-center h-8 sm:h-9"
@@ -431,7 +437,7 @@ export default function Dashboard() {
                               </Button>
 
                               <Button
-                                onClick={() => handleGenerateContent(file.id, 'flashcards')}
+                                onClick={() => handleGenerateContent(file.id, file.fileName, 'flashcards')}
                                 disabled={selectedAction?.fileId === file.id && selectedAction?.action === 'flashcards' || file.status !== "processed"}
                                 variant="outline"
                                 className="gap-1 sm:gap-2 justify-center h-8 sm:h-9"
@@ -444,7 +450,7 @@ export default function Dashboard() {
                               </Button>
 
                               <Button
-                                onClick={() => handleGenerateContent(file.id, 'qa')}
+                                onClick={() => handleGenerateContent(file.id, file.fileName, 'qa')}
                                 disabled={selectedAction?.fileId === file.id && selectedAction?.action === 'qa' || file.status !== "processed"}
                                 variant="outline"
                                 className="gap-1 sm:gap-2 justify-center h-8 sm:h-9"
