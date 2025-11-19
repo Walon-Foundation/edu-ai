@@ -8,7 +8,7 @@ import { and, eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
 import { PDFParse } from "pdf-parse"
 
-export async function POST(req:NextRequest, {params}:{params:Promise<{fileName:string}>}){
+export async function GET(req:NextRequest, {params}:{params:Promise<{fileName:string}>}){
     try{
         const { userId } = await auth()
         const fileName = (await params).fileName
