@@ -13,7 +13,6 @@ import {
   Download, 
   Copy, 
   BookOpen,
-  Layers,
   HelpCircle,
   FileText,
   Loader2,
@@ -23,89 +22,6 @@ import {
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-// Demo data for testing
-const demoContent = {
-  summary: `# Introduction to Machine Learning - Summary
-
-## Core Concepts
-Machine learning is a subset of artificial intelligence that enables computers to learn and make decisions without being explicitly programmed. It focuses on developing algorithms that can identify patterns in data and make predictions or decisions based on that data.
-
-## Main Approaches
-- **Supervised Learning**: Algorithms learn from labeled training data (e.g., classification, regression)
-- **Unsupervised Learning**: Algorithms find patterns in unlabeled data (e.g., clustering, dimensionality reduction)
-- **Reinforcement Learning**: Algorithms learn through trial and error using rewards and punishments
-
-## Key Applications
-- Image and speech recognition
-- Natural language processing
-- Recommendation systems
-- Fraud detection
-- Autonomous vehicles
-
-## Importance
-Machine learning is transforming industries by enabling data-driven decision making, automating complex tasks, and uncovering insights from large datasets that would be impossible for humans to analyze manually.`,
-
-  flashcards: `Q: What is machine learning?
-A: A subset of AI that enables computers to learn from data without explicit programming.
-
-Q: What are the three main types of machine learning?
-A: Supervised learning, unsupervised learning, and reinforcement learning.
-
-Q: What is supervised learning?
-A: Learning from labeled training data to make predictions or decisions.
-
-Q: What is unsupervised learning?
-A: Finding patterns and relationships in unlabeled data.
-
-Q: What is reinforcement learning?
-A: Learning through trial and error using a system of rewards and punishments.
-
-Q: What is a common application of machine learning?
-A: Image recognition, recommendation systems, or fraud detection.
-
-Q: What is the difference between AI and machine learning?
-A: AI is the broader concept, while machine learning is a specific approach to achieving AI.
-
-Q: What is training data?
-A: The dataset used to teach a machine learning model.
-
-Q: What is a neural network?
-A: A computing system inspired by the human brain that can learn patterns.
-
-Q: What is overfitting?
-A: When a model learns the training data too well and performs poorly on new data.`,
-
-  qa: `Q: What is the main goal of machine learning?
-A: To enable computers to learn from data and make predictions or decisions without being explicitly programmed for each task.
-
-Q: How does supervised learning work?
-A: It uses labeled training data where each example is paired with the correct output, allowing the algorithm to learn the mapping between inputs and outputs.
-
-Q: What are some common unsupervised learning techniques?
-A: Clustering (grouping similar data points) and dimensionality reduction (simplifying data while preserving its structure).
-
-Q: Why is reinforcement learning different from other approaches?
-A: It doesn't use labeled data but instead learns through interaction with an environment and receiving rewards or penalties for actions.
-
-Q: What is the role of training data in machine learning?
-A: Training data is used to teach the algorithm patterns and relationships, allowing it to make accurate predictions on new, unseen data.
-
-Q: How does machine learning handle large datasets?
-A: Through algorithms that can efficiently process and find patterns in massive amounts of data that would be impractical for humans to analyze.
-
-Q: What is the importance of feature selection?
-A: Choosing the right features (input variables) significantly impacts model performance and helps avoid overfitting.
-
-Q: How do recommendation systems use machine learning?
-A: They analyze user behavior and preferences to suggest relevant products, content, or services.
-
-Q: What is deep learning?
-A: A subset of machine learning that uses neural networks with multiple layers to learn complex patterns in data.
-
-Q: Why is model evaluation important?
-A: It ensures the model performs well on new data and helps identify issues like overfitting or bias.`
-};
-
 export default function GeneratePage() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -113,13 +29,12 @@ export default function GeneratePage() {
   
   const fileName = decodeURIComponent(params.fileName as string);
   const fileId = searchParams.get('fileId');
-  const action = searchParams.get('action') as 'summary' | 'flashcards' | 'qa' | null;
+  const action = searchParams.get('action') as 'summary' | 'qa' | null;
   
   const [generatedContent, setGeneratedContent] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [useDemoData, setUseDemoData] = useState(false);
 
   useEffect(() => {
     if (fileId && action) {
@@ -136,51 +51,34 @@ export default function GeneratePage() {
       setError(null);
       setGeneratedContent("");
 
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // For demo purposes, sometimes simulate API failure
-      const shouldFail = Math.random() < 0.1; // 10% chance of failure
-      
-      if (shouldFail && !useDemoData) {
-        throw new Error('API service temporarily unavailable. Please try again.');
-      }
-
-      // Use demo data if API fails or if demo mode is enabled
-      if (useDemoData || shouldFail) {
-        setGeneratedContent(demoContent[action as keyof typeof demoContent] || demoContent.summary);
-        setUseDemoData(true);
+      // Determine the correct API endpoint based on action
+      let apiEndpoint = '';
+      if (action === 'summary') {
+        apiEndpoint = `/api/generate/${fileId}/summaries`;
+      } else if (action === 'qa') {
+        apiEndpoint = `/api/generate/${fileId}/question-and-answer`;
       } else {
-        // In a real app, this would be your actual API call
-        const response = await fetch('/api/generate', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            fileId,
-            action
-          }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Generation failed');
-        }
-
-        const result = await response.json();
-        setGeneratedContent(result.content);
+        throw new Error('Invalid action type');
       }
+
+      const response = await fetch(apiEndpoint, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Generation failed');
+      }
+
+      const result = await response.json();
+      setGeneratedContent(result.content || result.data || '');
       
     } catch (error) {
       console.error('Error generating content:', error);
-      // If API fails, fall back to demo data
-      if (action && demoContent[action as keyof typeof demoContent]) {
-        setGeneratedContent(demoContent[action as keyof typeof demoContent]);
-        setUseDemoData(true);
-      } else {
-        setError(error instanceof Error ? error.message : 'Failed to generate content');
-      }
+      setError(error instanceof Error ? error.message : 'Failed to generate content');
     } finally {
       setLoading(false);
     }
@@ -206,7 +104,7 @@ export default function GeneratePage() {
     URL.revokeObjectURL(url);
   };
 
-  const handleRegenerate = (newAction: 'summary' | 'flashcards' | 'qa') => {
+  const handleRegenerate = (newAction: 'summary' | 'qa') => {
     // Update URL with new action and trigger regeneration
     const newUrl = `/generate/${encodeURIComponent(fileName)}?fileId=${fileId}&action=${newAction}`;
     router.push(newUrl);
@@ -215,7 +113,6 @@ export default function GeneratePage() {
   const getActionDisplayName = () => {
     const names = {
       summary: 'Summary',
-      flashcards: 'Flashcards', 
       qa: 'Questions & Answers'
     };
     return names[action as keyof typeof names] || 'Content';
@@ -224,7 +121,6 @@ export default function GeneratePage() {
   const getActionIcon = () => {
     const icons = {
       summary: BookOpen,
-      flashcards: Layers,
       qa: HelpCircle
     };
     return icons[action as keyof typeof icons] || FileText;
@@ -305,11 +201,6 @@ export default function GeneratePage() {
                   <Badge variant="secondary" className="capitalize">
                     {getActionDisplayName()}
                   </Badge>
-                  {useDemoData && (
-                    <Badge variant="outline" className="text-amber-600 border-amber-200">
-                      Demo Data
-                    </Badge>
-                  )}
                 </div>
               </div>
             </div>
@@ -319,12 +210,16 @@ export default function GeneratePage() {
                 variant="outline" 
                 onClick={handleCopy} 
                 className="gap-2"
-                disabled={copied}
+                disabled={copied || !generatedContent}
               >
                 {copied ? <CheckCircle2 className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                 {copied ? 'Copied!' : 'Copy'}
               </Button>
-              <Button onClick={handleDownload} className="gap-2">
+              <Button 
+                onClick={handleDownload} 
+                className="gap-2"
+                disabled={!generatedContent}
+              >
                 <Download className="h-4 w-4" />
                 Download
               </Button>
@@ -332,18 +227,6 @@ export default function GeneratePage() {
           </div>
         </div>
       </div> */}
-
-      {/* Demo Data Notice */}
-      {useDemoData && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-          <Alert className="bg-amber-50 border-amber-200">
-            <AlertCircle className="h-4 w-4 text-amber-600" />
-            <AlertDescription className="text-amber-800">
-              Showing demo content. In a real application, this would be AI-generated from your PDF.
-            </AlertDescription>
-          </Alert>
-        </div>
-      )}
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -359,42 +242,21 @@ export default function GeneratePage() {
                   onClick={() => handleRegenerate('summary')}
                   variant={action === 'summary' ? 'default' : 'outline'}
                   className="w-full justify-start gap-2"
+                  disabled={loading}
                 >
                   <BookOpen className="h-4 w-4" />
                   Summary
                 </Button>
                 
                 <Button
-                  onClick={() => handleRegenerate('flashcards')}
-                  variant={action === 'flashcards' ? 'default' : 'outline'}
-                  className="w-full justify-start gap-2"
-                >
-                  <Layers className="h-4 w-4" />
-                  Flashcards
-                </Button>
-                
-                <Button
                   onClick={() => handleRegenerate('qa')}
                   variant={action === 'qa' ? 'default' : 'outline'}
                   className="w-full justify-start gap-2"
+                  disabled={loading}
                 >
                   <HelpCircle className="h-4 w-4" />
                   Q&A
                 </Button>
-
-                {/* Demo Mode Toggle */}
-                <div className="pt-4 border-t">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Demo Mode</span>
-                    <Button
-                      variant={useDemoData ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setUseDemoData(!useDemoData)}
-                    >
-                      {useDemoData ? "On" : "Off"}
-                    </Button>
-                  </div>
-                </div>
               </CardContent>
             </Card>
 
@@ -413,11 +275,6 @@ export default function GeneratePage() {
                   <div>
                     <span>Created: {new Date().toLocaleDateString()}</span>
                   </div>
-                  {useDemoData && (
-                    <div className="text-amber-600 text-xs">
-                      Using demo machine learning content
-                    </div>
-                  )}
                 </div>
               </CardContent>
             </Card>
@@ -429,11 +286,26 @@ export default function GeneratePage() {
               <CardContent className="p-0">
                 <ScrollArea className="h-[75vh]">
                   <div className="p-6">
-                    <div className="prose max-w-none">
-                      <pre className="whitespace-pre-wrap font-sans text-base leading-relaxed text-gray-900 bg-gray-50 p-6 rounded-lg">
-                        {generatedContent}
-                      </pre>
-                    </div>
+                    {generatedContent ? (
+                      <div className="prose max-w-none">
+                        <pre className="whitespace-pre-wrap font-sans text-base leading-relaxed text-gray-900 bg-gray-50 p-6 rounded-lg">
+                          {generatedContent}
+                        </pre>
+                      </div>
+                    ) : (
+                      <div className="text-center py-12">
+                        <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                          No Content Generated
+                        </h3>
+                        <p className="text-gray-600 mb-4">
+                          The generation process completed but no content was returned.
+                        </p>
+                        <Button onClick={generateContent}>
+                          Try Again
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </ScrollArea>
               </CardContent>
