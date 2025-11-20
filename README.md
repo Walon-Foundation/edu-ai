@@ -4,7 +4,7 @@
 Edu-Ai is a Next.js-based web application that ingests PDF files and uses AI backends to generate educational content — specifically summaries, flash-cards, and question-and-answer (Q&A) materials. It includes PDF upload and generation endpoints, user authentication, database wiring with Drizzle ORM, and integrations with Supabase, Clerk (auth), and OpenRouter (or other LLM providers).
 
 This repository contains the full-stack app (Next.js app router), API routes for PDF upload and content generation, a small suite of UI components, and database configuration using Drizzle.
-
+Edu-Ai is a Next.js-based weEdu-Ai is a Next.js-based web application that ingests PDF files and uses AI backends to generate educational content — specifically summaries, flash-cards, and question-and-answer (Q&A) materials.b application that ingests PDF files and uses AI backends to generate educational content — specifically summaries, flash-cards, and question-and-answer (Q&A) materials.
 ## Highlights
 
 - Next.js (App Router) front-end with React 19
