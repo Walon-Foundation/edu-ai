@@ -19,8 +19,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import ReactMarkdown from 'react-markdown'; 
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Badge } from "@/components/ui/badge";
+
+
+// ...
 
 export default function GeneratePage() {
   const params = useParams();
@@ -199,7 +203,7 @@ export default function GeneratePage() {
                 Back to Files
               </Button>
               <div className="min-w-0">
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 break-words">
                   {fileName}
                 </h1>
                 <div className="flex items-center gap-2 mt-1">
@@ -294,8 +298,8 @@ export default function GeneratePage() {
                   <div className="p-6">
                     {generatedContent ? (
                       // ⬅️ FIX APPLIED HERE: Replaced <pre> with a <div> containing <ReactMarkdown>
-                      <div className="prose max-w-none bg-gray-50 p-6 rounded-lg"> 
-                        <ReactMarkdown>
+                      <div className="prose prose-sm max-w-none bg-gray-50 dark:bg-gray-800 dark:text-gray-200 p-6 rounded-lg overflow-auto max-h-[70vh] border border-gray-200 dark:border-gray-700 shadow-sm whitespace-pre-wrap"> 
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
                           {generatedContent}
                         </ReactMarkdown>
                       </div>
