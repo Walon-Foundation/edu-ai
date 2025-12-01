@@ -22,6 +22,13 @@
       "when": 1763540578895,
       "tag": "0002_tan_khan",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1764584467854,
+      "tag": "0003_flawless_lionheart",
+      "breakpoints": true
     }
   ]
 }
