@@ -2,8 +2,9 @@ import { auth } from "@clerk/nextjs/server";
 import { and, eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import { db } from "@/db/db";
-import { fileTable } from "@/db/schema";
+import { fileTable, generationsTable } from "@/db/schema";
 import { env } from "@/lib/env";
+import { nanoid } from "nanoid";
 import { errorResponse, successResponse } from "@/lib/httpHelper";
 import { supabase } from "@/lib/supabase";
 
@@ -131,6 +132,13 @@ export async function GET(
         "Failed to generate question and answers: AI result was empty",
       );
     }
+
+    await db.insert(generationsTable).values({
+      id: nanoid(),
+      fileId: file.id,
+      type: "qa",
+      content: aiResult,
+    });
 
     return successResponse(200, `Q&A of the PDF ${file.fileName}`, aiResult);
   } catch (error) {
